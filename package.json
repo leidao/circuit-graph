@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "serve": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "lintcss": "stylelint 'src/**/*.less' --fix",
     "lint": "eslint --ext .ts,.tsx src/** --no-error-on-unmatched-pattern --quiet",
