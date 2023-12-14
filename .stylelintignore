@@ -1,0 +1,12 @@
+*.min.css
+ 
+# 其他类型文件
+*.js
+*.jpg
+*.woff
+ 
+# 测试和打包目录
+/test/
+/dist/
+
+node_module/*

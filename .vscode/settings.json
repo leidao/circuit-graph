@@ -1,0 +1,74 @@
+
+{
+    // 默认使用prettier格式化支持的文件
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    // 自动设定eslint工作区
+    "eslint.workingDirectories": [
+      {
+        "mode": "auto"
+      }
+    ],
+    "eslint.run": "onType",
+    "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      "vue",
+      "html",
+      "json",
+      "typescript",
+      "typescriptreact"
+    ],
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.fixAll.eslint": "explicit",
+      "source.fixAll.stylelint": "explicit"
+    },
+    "eslint.alwaysShowStatus": true,
+    "editor.formatOnSave": false,
+    "[json]": {
+      "editor.quickSuggestions": {
+        "strings": true
+      },
+      "editor.suggest.insertMode": "replace"
+    },
+    "editor.formatOnPaste": true,
+    "eslint.format.enable": true,
+    "explorer.confirmDelete": false,
+    "interview.updateNotification": 1648024020657,
+    "interview.workspaceFolder": "C:\\Users\\amin\\.FEInterview",
+    "editor.fontSize": 18,
+    "leek-fund.statusBarStock": ["sh603337"],
+    "editor.accessibilitySupport": "off",
+    "editor.fontLigatures": true,
+    "prettier.jsxSingleQuote": true,
+    "prettier.requireConfig": true,
+    "prettier.semi": false,
+    "prettier.singleQuote": true,
+    "diffEditor.ignoreTrimWhitespace": false, // 开启保存格式化
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "diffEditor.wordWrap": "on",
+    "editor.tabSize": 2,
+    "prettier.requirePragma": true,
+    "prettier.endOfLine": "auto",
+    "prettier.insertPragma": true,
+    "prettier.withNodeModules": true, // 特定语言
+    "[html]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[vue]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[css]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "launch": {
+      "configurations": [],
+      "compounds": []
+    },
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "git.autofetch": true,
+    "tabnine.experimentalAutoImports": true,
+}

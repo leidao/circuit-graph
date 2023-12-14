@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "outDir": "./dist/js",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "skipLibCheck": false,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "declaration": true, // 是否生成声明文件
+    "declarationDir": "./dist/types/", // 声明文件打包的位置
+    "declarationMap": false, // 是否生成声明文件map文件（便于调试）
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": false,
+    "jsx": "react-jsx",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": [
+    // 通过终端的task，会自动监视ts代码变化输出结果到dist中
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ], // 要打包的文件
+  "exclude": [
+    // 排除那些文件不打包
+    "node_modules",
+    "*.test.ts"
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
