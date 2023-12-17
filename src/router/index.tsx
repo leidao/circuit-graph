@@ -3,19 +3,15 @@
  * @Author: ldx
  * @Date: 2022-04-06 14:45:22
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-14 16:18:54
+ * @LastEditTime: 2023-12-16 14:30:29
  */
-import React, { Suspense, useEffect } from 'react'
-import {
-  Route,
-  Routes,
-} from 'react-router-dom'
+import React, { Suspense } from 'react'
+import { Route, Routes } from 'react-router-dom'
 
 import { RouteLoading } from '@/components'
 
 import routes from './routes'
 const RouteList: React.FC = () => {
-
   return (
     <Suspense fallback={<RouteLoading />}>
       <Routes>

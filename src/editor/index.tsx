@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2022-04-06 19:34:55
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-09 15:04:56
+ * @LastEditTime: 2023-12-14 17:25:00
  */
 import { useEffect, useRef, useState } from 'react'
 
@@ -85,12 +85,20 @@ const Home = () => {
             )
           })}
         </div>
-        <div className="flex-1 border-r-1px border-#dadadc99 p-10px">
+        <div
+          className="flex-1 border-r-1px border-#dadadc99 p-10px"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(82px, 1fr))',
+            gridTemplateRows: 'repeat(auto-fill, minmax(72px, 1fr))',
+            gap: '10px 6px'
+          }}
+        >
           {imgs.map((img) => {
             return (
               <div
                 key={img.id}
-                className="w-82px p-6px box-border cursor-pointer border-1px hover:border-#666 rounded-6px border-#fff"
+                className="w-82px h-80px p-6px box-border cursor-pointer border-1px hover:border-#666 rounded-6px border-#fff flex flex-col justify-between"
               >
                 <img
                   src={img.url}
@@ -99,10 +107,11 @@ const Home = () => {
                   height="50"
                   onDragStart={dragstart}
                   onDragEnd={dragend}
+                  className="cursor-copy"
                 />
                 <div
                   className="max-w-70px text-center"
-                  style={{ font: '12px arial, sans-serif' }}
+                  style={{ font: '16px arial, sans-serif' }}
                 >
                   {img.name}
                 </div>

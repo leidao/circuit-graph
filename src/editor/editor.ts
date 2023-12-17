@@ -3,14 +3,16 @@
  * @Author: ldx
  * @Date: 2023-12-01 17:17:18
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-09 14:57:41
+ * @LastEditTime: 2023-12-17 10:46:29
  */
 
 import _ from 'lodash'
 
-import { Img, Line, OrbitControler, Scene, Vector2 } from '@/dxCanvas'
+import { Img, Line, OrbitControler, Vector2 } from '@/dxCanvas'
+import { Scene } from '@/dxCanvas/core/scene1'
 import { Ruler } from '@/dxCanvas/objects/ruler'
 
+import KeybordManager from './command/keybordManger'
 import ToolManager from './tools/toolManager'
 
 type Option = {
@@ -33,7 +35,7 @@ export class Editor {
   /** 缩放比例 */
   scale = 1
   /** canvas元素 */
-  domElement!: HTMLCanvasElement
+  domElement!: HTMLDivElement
   /* 鼠标的裁剪坐标位 */
   mouseClipPos = new Vector2(Infinity)
   /** 当前工具栏 */
@@ -45,15 +47,17 @@ export class Editor {
   selectImg!: null | HTMLImageElement
   /** tool管理器 */
   toolManager!: ToolManager
+  /** 快捷键管理器 */
+  keybordManager!: KeybordManager
   constructor(option: Option) {
     this.option = option
     if (!this.option.container) return
     // 场景相关
     const container = this.option.container
-    const canvas = document.createElement('canvas')
-    container.appendChild(canvas)
-    this.domElement = canvas
-    this.scene = new Scene({ domElement: canvas })
+    // const canvas = document.createElement('canvas')
+    // container.appendChild(canvas)
+    this.domElement = container
+    this.scene = new Scene({ container: container })
     this.listen()
     // 标尺相关
     const rulerConfig = {
@@ -74,6 +78,7 @@ export class Editor {
     this.scene.render()
     // tool管理
     this.toolManager = new ToolManager(this)
+    this.keybordManager = new KeybordManager(this)
   }
 
   /** 缩放 */

@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-14 11:13:05
+ * @LastEditTime: 2023-12-16 17:51:48
  */
 import { dpr } from '../core/camera'
 import { Matrix3 } from '../math/matrix3'
@@ -50,7 +50,7 @@ export class Line extends Object2D {
     }
   }
   /** 样式设置 */
-  setStyle(attr: StandStyleType){
+  setStyle(attr: StandStyleType) {
     this.style.setOption(attr)
   }
 
@@ -59,13 +59,13 @@ export class Line extends Object2D {
     this.points = points
   }
   /** 追加点位 */
-  addPoints(point: [number, number]) {
-    this.points.push(point)
+  addPoints(...rest: [number, number][]) {
+    this.points.push(...rest)
   }
-  /** 替换最后一个坐标 */
-  replacePoint(point: [number, number]) {
+  /** 替换坐标 */
+  replacePoints(i: number, n: number, ...rest: [number, number][]) {
     const { points } = this
-    points.splice(points.length - 1, 1, point)
+    points.splice(i, n, ...rest)
   }
   /* 绘图 */
   drawShape(ctx: CanvasRenderingContext2D) {
@@ -76,8 +76,6 @@ export class Line extends Object2D {
     // 绘制图像
     ctx.beginPath()
     const flatPoints = points.flat()
-    console.log('flatPoints', flatPoints);
-
     crtPath(ctx, flatPoints)
     ctx.stroke()
   }

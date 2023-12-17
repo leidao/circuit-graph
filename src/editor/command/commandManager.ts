@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 18:58:58
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-10 08:25:46
+ * @LastEditTime: 2023-12-16 17:45:06
  */
 import { Editor } from '../editor'
 import CommandBase from './commandBase'
@@ -11,7 +11,6 @@ import { KeyboardCode } from './keybord-code'
 type State = {
   current: number
   queue: any[]
-  commandArray: CommandMap[]
 }
 type CommandMap = {
   name: string
@@ -19,19 +18,14 @@ type CommandMap = {
   execute: (editor: Editor) => void
 }
 
-export default class Command {
+export default class CommandManger {
   // [key: string]: any
   state: State = {
     // 前进后退需要指针
     current: -1, // 前进后退的索引值
-    queue: [], //  存放所有的操作命令
-    commandArray: [] // 存放所有的命令
+    queue: [] //  存放所有的操作命令
   }
-  commands = {} // 制作命令和执行功能一个映射表  undo : ()=>{}  redo:()=>{}
-  constructor(private editor: Editor) {
-    // 监听键盘事件
-    this.listen()
-  }
+  constructor(private editor: Editor) {}
   execute(cmd: CommandBase) {
     // 执行命令
     cmd.redo()
@@ -64,51 +58,5 @@ export default class Command {
       cmd.undo && cmd.undo() // 这里没有操作队列
       this.state.current--
     }
-  }
-  registry(command: CommandMap) {
-    this.state.commandArray.push(command)
-    // this[command.name] = command.execute
-  }
-
-  onKeydown = (event: KeyboardEvent) => {
-    if (
-      event.target instanceof HTMLInputElement ||
-      event.target instanceof HTMLTextAreaElement
-    ) {
-      return
-    }
-
-    const { keyCode, shiftKey, altKey, ctrlKey, metaKey } = event
-    const keyString: string[] = []
-    if (ctrlKey || metaKey) keyString.push('ctrl')
-    if (shiftKey) keyString.push('shift')
-    if (altKey) keyString.push('alt')
-
-    keyString.push(KeyboardCode[keyCode])
-    const keyNames = keyString.join('+')
-    console.log('keyNames', keyNames)
-
-    const commandArray = this.state.commandArray
-    // 执行对应键盘命令
-    commandArray.forEach(({ keyboard, execute }) => {
-      if (!keyboard) {
-        return
-      }
-      const keys = Array.isArray(keyboard) ? keyboard : [keyboard]
-      if (keys.indexOf(keyNames) > -1) {
-        execute(this.editor)
-        event.stopPropagation()
-        event.preventDefault()
-      }
-    })
-  }
-
-  // 初始化事件
-  listen() {
-    window.addEventListener('keydown', this.onKeydown)
-  }
-  // 销毁事件
-  destroy() {
-    window.removeEventListener('keydown', this.onKeydown)
   }
 }

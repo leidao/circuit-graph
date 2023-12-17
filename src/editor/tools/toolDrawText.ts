@@ -1,15 +1,15 @@
 /*
- * @Description: 绘制线段
+ * @Description: 绘制文字
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-16 17:51:06
+ * @LastEditTime: 2023-12-16 17:52:43
  */
-import { Line } from '@/dxCanvas'
+import { Line, Text2D } from '@/dxCanvas'
 
 import { Editor } from '../editor'
 import ToolBase from './toolBase'
-class ToolDrawLine extends ToolBase {
+class ToolDrawText extends ToolBase {
   readonly keyboard = ''
   readonly type = 'drawLine'
   line: Line | null = null
@@ -95,4 +95,4 @@ class ToolDrawLine extends ToolBase {
     this.editor.keybordManager.unRegister('drawLineFinish')
   }
 }
-export default ToolDrawLine
+export default ToolDrawText
