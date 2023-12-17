@@ -177,4 +177,7 @@ export class Ruler extends Object2D {
       startYInScene += stepInScene
     }
   }
+  crtPath() {
+    //
+  }
 }

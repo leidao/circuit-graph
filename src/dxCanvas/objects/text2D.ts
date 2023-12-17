@@ -8,7 +8,7 @@ type TextType = Object2DType & {
   text?: string
   maxWidth?: number | undefined
   style?: TextStyleType
-   offset?: Vector2
+  offset?: Vector2
 }
 
 /* 虚拟上下文对象 */
@@ -22,7 +22,7 @@ const alignRatio = {
   left: 0,
   center: -0.5,
   end: -1,
-  right: -1,
+  right: -1
 }
 const baselineRatio = {
   top: 0,
@@ -30,7 +30,7 @@ const baselineRatio = {
   bottom: -1,
   hanging: -0.05,
   alphabetic: -0.78,
-  ideographic: -1,
+  ideographic: -1
 }
 
 class Text2D extends Object2D {
@@ -49,7 +49,7 @@ class Text2D extends Object2D {
 
   /* 属性设置 */
   setOption(attr: TextType) {
-    for (let [key, val] of Object.entries(attr)) {
+    for (const [key, val] of Object.entries(attr)) {
       if (key === 'style') {
         this.style.setOption(val)
       } else {
@@ -63,10 +63,9 @@ class Text2D extends Object2D {
     const { style, text, maxWidth } = this
     style.setFont(virtuallyCtx)
     const { width } = virtuallyCtx.measureText(text)
-    let w = maxWidth === undefined ? width : Math.min(width, maxWidth)
+    const w = maxWidth === undefined ? width : Math.min(width, maxWidth)
     return new Vector2(w, style.fontSize)
   }
-
 
   /* 计算边界盒子 */
   computeBoundingBox() {
@@ -74,7 +73,7 @@ class Text2D extends Object2D {
       boundingBox: { min, max },
       size,
       offset,
-      style: { textAlign, textBaseline },
+      style: { textAlign, textBaseline }
     } = this
 
     min.set(
@@ -90,13 +89,13 @@ class Text2D extends Object2D {
       text,
       offset: { x, y },
       maxWidth,
-      style,
+      style
     } = this
 
     //样式
     style.apply(ctx)
     // 绘图
-    for (let method of style.drawOrder) {
+    for (const method of style.drawOrder) {
       style[`${method}Style`] && ctx[`${method}Text`](text, x, y, maxWidth)
     }
   }
@@ -107,8 +106,8 @@ class Text2D extends Object2D {
     const {
       boundingBox: {
         min: { x: x0, y: y0 },
-        max: { x: x1, y: y1 },
-      },
+        max: { x: x1, y: y1 }
+      }
     } = this
     crtPathByMatrix(ctx, [x0, y0, x1, y0, x1, y1, x0, y1], matrix)
   }

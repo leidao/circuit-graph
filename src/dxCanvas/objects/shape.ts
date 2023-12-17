@@ -3,9 +3,8 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-12 15:18:12
+ * @LastEditTime: 2023-12-17 11:01:26
  */
-import { dpr } from '../core/camera'
 import { Matrix3 } from '../math/matrix3'
 import { StandStyle, StandStyleType } from '../style/standStyle'
 import { Object2D, Object2DType } from './object2D'
@@ -29,12 +28,10 @@ export class Shape extends Object2D {
   }
   /* 世界模型矩阵*偏移矩阵 */
   get moMatrix(): Matrix3 {
-
     return this.worldMatrix
   }
   /* 视图投影矩阵*世界模型矩阵*偏移矩阵  */
   get pvmoMatrix(): Matrix3 {
-
     return this.pvmMatrix
   }
 
@@ -70,21 +67,21 @@ export class Shape extends Object2D {
   }
   /* 绘图 */
   drawShape(ctx: CanvasRenderingContext2D) {
-    const { points, style, color, lineWidth } = this
+    const { points, style } = this
     if (points.length === 0) return
     //样式
     style.apply(ctx)
     // 绘制图像
     ctx.beginPath()
     const flatPoints = points.flat()
-    crtPath(ctx, flatPoints,true)
+    crtPath(ctx, flatPoints, true)
     ctx.fill()
     ctx.stroke()
   }
 
   /* 绘制图像边界 */
   crtPath(ctx: CanvasRenderingContext2D, matrix = this.pvmoMatrix) {
-    const { points, style, color, lineWidth } = this
+    const { points, style } = this
     if (points.length === 0) return
     //样式
     style.apply(ctx)

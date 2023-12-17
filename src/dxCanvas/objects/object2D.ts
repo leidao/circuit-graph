@@ -3,9 +3,8 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-12 14:04:49
+ * @LastEditTime: 2023-12-17 10:59:24
  */
-import { dpr } from '../core/camera'
 import { EventDispatcher } from '../core/eventDispatcher'
 import { Scene } from '../core/scene'
 import { generateUUID } from '../math/mathUtils.js'
@@ -22,11 +21,11 @@ export type Object2DType = {
   name?: string
   parent?: Scene | Group | undefined
   enableCamera?: boolean
-  userData?: { [key: string]: any}
+  userData?: { [key: string]: any }
   [key: string]: any
 }
 
-export class Object2D extends EventDispatcher {
+export abstract class Object2D extends EventDispatcher {
   /** 自定义属性 */
   [key: string]: any
   /** 位置 */
@@ -48,7 +47,7 @@ export class Object2D extends EventDispatcher {
   /** UUID */
   uuid = generateUUID()
   /** 自定义数据 */
-  userData: { [key: string]: any} = {}
+  userData: { [key: string]: any } = {}
   /** 类型 */
   readonly isObject2D = true
 
@@ -138,8 +137,11 @@ export class Object2D extends EventDispatcher {
   }
 
   /* 绘制图形-接口 */
-  drawShape(ctx: CanvasRenderingContext2D) { }
+  abstract drawShape(ctx: CanvasRenderingContext2D): void
 
   /* 创建路径-接口 */
-  crtPath(ctx: CanvasRenderingContext2D, projectionMatrix: Matrix3) { }
+  abstract crtPath(
+    ctx: CanvasRenderingContext2D,
+    projectionMatrix: Matrix3
+  ): void
 }

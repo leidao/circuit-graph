@@ -8,8 +8,7 @@
 
 import _ from 'lodash'
 
-import { Img, Line, OrbitControler, Vector2 } from '@/dxCanvas'
-import { Scene } from '@/dxCanvas/core/scene1'
+import { Img, Line, OrbitControler, Scene, Vector2 } from '@/dxCanvas'
 import { Ruler } from '@/dxCanvas/objects/ruler'
 
 import KeybordManager from './command/keybordManger'

@@ -22,8 +22,8 @@ export type TextStyleType = {
 class TextStyle extends StandStyle {
   fontStyle: FontStyle = ''
   fontWeight: FontWeight = ''
-  fontSize: number = 12
-  fontFamily: string = 'arial'
+  fontSize = 12
+  fontFamily = 'arial'
   textAlign: CanvasTextAlign = 'start'
   textBaseline: CanvasTextBaseline = 'alphabetic'
 

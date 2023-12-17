@@ -29,12 +29,12 @@ export type StandStyleType = {
 class StandStyle extends BasicStyle {
   strokeStyle: string | CanvasGradient | CanvasPattern | undefined
   fillStyle: string | CanvasGradient | CanvasPattern | undefined
-  lineWidth: number = 1
+  lineWidth = 1
   lineDash: number[] | undefined
-  lineDashOffset: number = 0
+  lineDashOffset = 0
   lineCap: CanvasLineCap = 'butt'
   lineJoin: CanvasLineJoin = 'miter'
-  miterLimit: number = 10
+  miterLimit = 10
 
   // 填充和描边的顺序, 默认0，即先填充再描边
   order: OrderType = 0
@@ -65,7 +65,7 @@ class StandStyle extends BasicStyle {
       lineJoin,
       miterLimit,
       lineDash,
-      lineDashOffset,
+      lineDashOffset
     } = this
 
     if (strokeStyle) {

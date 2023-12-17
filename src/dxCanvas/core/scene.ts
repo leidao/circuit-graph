@@ -3,75 +3,43 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-16 23:58:45
+ * @LastEditTime: 2023-12-17 10:58:17
  */
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
-import { Group } from '../objects/group'
 import { Img } from '../objects/img'
+import { Layer } from '../objects/layer'
 import { Object2D } from '../objects/object2D'
-import { Camera, dpr } from './camera'
+import { Camera } from './camera'
 
 type SceneType = {
-  domElement?: HTMLCanvasElement
-  camera?: Camera
+  container: HTMLDivElement
   autoClear?: boolean
-  isCenter?: boolean
+  autoCenter?: boolean
 }
-
-export class Scene extends Group {
+/** 场景的参数 */
+export const sceneParam = {} as SceneType
+export class Scene extends Layer {
   width!: number
   height!: number
-  /** canvas画布 */
-  _domElement!: HTMLCanvasElement
-  /** canvas 上下文对象 */
-  ctx!: CanvasRenderingContext2D
+  /** 容器 */
+  container!: HTMLDivElement
   /** 相机 */
   camera = new Camera()
   /** 是否自动清理画布 */
   autoClear = true
-  /** 画布是否居中 */
-  isCenter = true
+  /** 是否自动居中画布 */
+  autoCenter = true
   // 类型
   readonly isScene = true
 
-  constructor(attr: SceneType = {}) {
+  constructor(attr: SceneType) {
+    Object.assign(sceneParam, attr)
     super()
     this.setOption(attr)
-
-    // this.camera.position.copy(this.position)
-  }
-
-  get domElement() {
-    return this._domElement
-  }
-  set domElement(value) {
-    if (this._domElement === value) {
-      return
-    }
-    this._domElement = value
-    const container = this._domElement.parentElement
-    if (!container) return
-    const width = container.clientWidth
-    const height = container.clientHeight
-    this.setViewPort(width, height)
-    if (this.isCenter) {
-      this.camera.position.set(width / 2, height / 2)
-    }
-  }
-  setViewPort(width: number, height: number) {
-    this.domElement.style.width = width + 'px'
-    this.domElement.style.height = height + 'px'
-    this.domElement.width = width * dpr
-    this.domElement.height = height * dpr
-    this.ctx = this.domElement.getContext('2d') as CanvasRenderingContext2D
-  }
-  getViewPort() {
-    return {
-      width: this.domElement.width,
-      height: this.domElement.height,
-      viewportWidth: this.domElement.clientWidth,
-      viewportHeight: this.domElement.clientHeight
+    if (this.autoCenter) {
+      const { viewportWidth, viewportHeight } = this.getViewPort()
+      this.camera.position.set(viewportWidth / 2, viewportHeight / 2)
     }
   }
 
@@ -97,9 +65,6 @@ export class Scene extends Group {
     autoClear && ctx.clearRect(0, 0, width, height)
     ctx.fillStyle = '#f4f4f4'
     ctx.fillRect(0, 0, width, height)
-
-    //TODO 缩放不准,需解决
-    // this.transform(ctx)
 
     // 渲染子对象
     for (const obj of children) {

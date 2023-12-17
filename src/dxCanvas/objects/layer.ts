@@ -6,7 +6,7 @@
  * @LastEditTime: 2023-12-17 10:49:49
  */
 import { dpr } from '../core/camera'
-import { sceneParam } from '../core/scene1'
+import { sceneParam } from '../core/scene'
 import { Group } from './group'
 import { Object2DType } from './object2D'
 export class Layer extends Group {

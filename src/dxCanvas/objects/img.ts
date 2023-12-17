@@ -34,7 +34,6 @@ export class Img extends Object2D {
   view: View | undefined
   style: BasicStyle = new BasicStyle()
 
-
   // 类型
   readonly isImg = true
   constructor(attr: ImgType = {}) {

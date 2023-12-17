@@ -143,6 +143,6 @@ export class Group extends Object2D {
   }
   /* 绘制图像边界 */
   crtPath(ctx: CanvasRenderingContext2D, matrix = this.pvmoMatrix) {
-    this.children.forEach(obj=>obj.crtPath(ctx,matrix))
+    this.children.forEach((obj) => obj.crtPath(ctx, matrix))
   }
 }
