@@ -1,5 +1,6 @@
 // import { rotateInCanvas } from '../utils/canvas'
 import { dpr } from '../core/camera'
+import { Vector2 } from '../math/vector2'
 import { Object2D } from './object2D'
 import { getClosestTimesVal, nearestPixelVal } from './objectUtils'
 export const HALF_PI = Math.PI / 2
@@ -51,9 +52,9 @@ export class Ruler extends Object2D {
     // const setting = this.editor.setting
     // const viewport = this.editor.viewportManager.getViewport()
     const { config } = this
-    const scene = this.getScene()
-    if (!scene) return
-    const { viewportWidth, viewportHeight } = scene.getViewPort()
+    const layer = this.getLayer()
+    if (!layer) return
+    const { viewportWidth, viewportHeight } = layer.getViewPort()
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.save()
     ctx.scale(dpr, dpr)
@@ -88,12 +89,12 @@ export class Ruler extends Object2D {
     ctx.restore()
   }
   private drawXRuler(ctx: CanvasRenderingContext2D) {
-    const scene = this.getScene()
-    if (!scene) return
-    const { width } = scene.getViewPort()
+    const layer = this.getLayer()
+    if (!layer) return
+    const { width } = layer.getViewPort()
     const {
       camera: { position, zoom }
-    } = scene
+    } = layer
     const { config } = this
     // 绘制刻度线和刻度值
     // 计算 x 轴起点和终点范围
@@ -131,12 +132,12 @@ export class Ruler extends Object2D {
     }
   }
   private drawYRuler(ctx: CanvasRenderingContext2D) {
-    const scene = this.getScene()
-    if (!scene) return
-    const { height } = scene.getViewPort()
+    const layer = this.getLayer()
+    if (!layer) return
+    const { height } = layer.getViewPort()
     const {
       camera: { position, zoom }
-    } = scene
+    } = layer
     const { config } = this
     // 绘制刻度线和刻度值
     const stepInScene = getStepByZoom(zoom)
@@ -179,5 +180,59 @@ export class Ruler extends Object2D {
   }
   crtPath() {
     //
+  }
+  isPointInGraph(point: Vector2): Ruler | false {
+    const flag = this.isPointInBounds(point)
+    if (flag) {
+      const scene = this.getScene()
+      if (!scene) return false
+      const { w } = this.config
+      const { viewportWidth, viewportHeight } = scene.getViewPort()
+      const coord = scene.coordToCanvas(point)
+      const points: [number, number][] = [
+        [0, 0],
+        [viewportWidth, 0],
+        [viewportWidth, w],
+        [w, w],
+        [w, viewportHeight],
+        [0, viewportHeight]
+      ]
+      let wn = 0 // 绕组数
+
+      for (let i = 0; i < points.length; i++) {
+        const p1 = points[i]
+        const p2 = points[(i + 1) % points.length]
+
+        if (p1[1] <= coord.y) {
+          if (p2[1] > coord.y && this.isLeft(p1, p2, coord) > 0) {
+            wn++
+          }
+        } else {
+          if (p2[1] <= coord.y && this.isLeft(p1, p2, coord) < 0) {
+            wn--
+          }
+        }
+      }
+
+      return wn !== 0 ? this : false
+    }
+    return false
+  }
+  private isLeft(
+    p0: [number, number],
+    p1: [number, number],
+    p2: Vector2
+  ): number {
+    return (p1[0] - p0[0]) * (p2.y - p0[1]) - (p2.x - p0[0]) * (p1[1] - p0[1])
+  }
+  computeBoundingBox() {
+    const {
+      boundingBox: { min, max }
+    } = this
+    const layer = this.getLayer()
+    if (!layer) return
+    const { viewportWidth, viewportHeight } = layer?.getViewPort()
+    min.set(-viewportWidth / 2, -viewportHeight / 2)
+    max.set(viewportWidth / 2, viewportHeight / 2)
   }
 }

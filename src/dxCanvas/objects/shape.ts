@@ -3,9 +3,10 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-17 11:01:26
+ * @LastEditTime: 2023-12-18 16:33:09
  */
 import { Matrix3 } from '../math/matrix3'
+import { Vector2 } from '../math/vector2'
 import { StandStyle, StandStyleType } from '../style/standStyle'
 import { Object2D, Object2DType } from './object2D'
 import { crtPath, crtPathByMatrix } from './objectUtils'
@@ -78,15 +79,61 @@ export class Shape extends Object2D {
     ctx.fill()
     ctx.stroke()
   }
+  /** 获取包围盒数据 */
+  computeBoundingBox() {
+    const {
+      points,
+      boundingBox: { min, max }
+    } = this
+    // 根据点计算边界
+    let minX = Infinity
+    let minY = Infinity
+    let maxX = -Infinity
+    let maxY = -Infinity
 
-  /* 绘制图像边界 */
-  crtPath(ctx: CanvasRenderingContext2D, matrix = this.pvmoMatrix) {
-    const { points, style } = this
-    if (points.length === 0) return
-    //样式
-    style.apply(ctx)
-    // 绘制图像
-    const flatPoints = points.flat()
-    crtPath(ctx, flatPoints, true)
+    for (const [x, y] of points) {
+      minX = Math.min(minX, x)
+      minY = Math.min(minY, y)
+      maxX = Math.max(maxX, x)
+      maxY = Math.max(maxY, y)
+    }
+    min.set(minX, minY)
+    max.set(maxX, maxY)
+  }
+  /** 点位是否在图形中 */
+  isPointInGraph(point: Vector2): Shape | false {
+    const isPointInBounds = this.isPointInBounds(point)
+    // 非零绕组规则
+    if (isPointInBounds) {
+      const { points } = this
+      let wn = 0 // 绕组数
+
+      for (let i = 0; i < points.length; i++) {
+        const p1 = points[i]
+        const p2 = points[(i + 1) % points.length]
+
+        if (p1[1] <= point.y) {
+          if (p2[1] > point.y && this.isLeft(p1, p2, point) > 0) {
+            wn++
+          }
+        } else {
+          if (p2[1] <= point.y && this.isLeft(p1, p2, point) < 0) {
+            wn--
+          }
+        }
+      }
+
+      return wn !== 0 ? this : false
+    }
+
+    return false
+  }
+
+  private isLeft(
+    p0: [number, number],
+    p1: [number, number],
+    p2: Vector2
+  ): number {
+    return (p1[0] - p0[0]) * (p2.y - p0[1]) - (p2.x - p0[0]) * (p1[1] - p0[1])
   }
 }

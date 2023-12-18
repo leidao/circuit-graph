@@ -3,8 +3,9 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-12 13:43:01
+ * @LastEditTime: 2023-12-18 16:55:42
  */
+import { Vector2 } from '../math/vector2'
 import { Object2D, Object2DType } from './object2D'
 
 export class Group extends Object2D {
@@ -142,7 +143,39 @@ export class Group extends Object2D {
     }
   }
   /* 绘制图像边界 */
-  crtPath(ctx: CanvasRenderingContext2D, matrix = this.pvmoMatrix) {
-    this.children.forEach((obj) => obj.crtPath(ctx, matrix))
+  crtPath(ctx: CanvasRenderingContext2D) {
+    this.children.forEach((obj) => obj.crtPath(ctx))
+  }
+  /** 获取包围盒数据 */
+  computeBoundingBox() {
+    const {
+      children,
+      boundingBox: { min, max }
+    } = this
+    // 根据点计算边界
+    let minX = Infinity
+    let minY = Infinity
+    let maxX = -Infinity
+    let maxY = -Infinity
+    for (const child of children) {
+      child.computeBoundingBox()
+      minX = Math.min(minX, child.boundingBox.min.x)
+      minY = Math.min(minY, child.boundingBox.min.y)
+      maxX = Math.max(maxX, child.boundingBox.max.x)
+      maxY = Math.max(maxY, child.boundingBox.max.y)
+    }
+    min.set(minX, minY)
+    max.set(maxX, maxY)
+  }
+  /** 点位是否在图形中 */
+  isPointInGraph(point: Vector2): Object2D | false {
+    const isPointInBounds = this.isPointInBounds(point)
+    if (isPointInBounds) {
+      for (const child of this.children) {
+        const flag = child.isPointInGraph(point)
+        if (flag) return child
+      }
+    }
+    return false
   }
 }

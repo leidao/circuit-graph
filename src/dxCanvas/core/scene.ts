@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-17 10:58:17
+ * @LastEditTime: 2023-12-18 16:46:11
  */
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
@@ -11,6 +11,7 @@ import { Img } from '../objects/img'
 import { Layer } from '../objects/layer'
 import { Object2D } from '../objects/object2D'
 import { Camera } from './camera'
+import { EventDispatcher } from './eventDispatcher'
 
 type SceneType = {
   container: HTMLDivElement
@@ -18,8 +19,8 @@ type SceneType = {
   autoCenter?: boolean
 }
 /** 场景的参数 */
-export const sceneParam = {} as SceneType
-export class Scene extends Layer {
+export const sceneParam = {} as SceneType & { camera: Camera }
+export class Scene extends EventDispatcher {
   width!: number
   height!: number
   /** 容器 */
@@ -32,109 +33,147 @@ export class Scene extends Layer {
   autoCenter = true
   // 类型
   readonly isScene = true
-
+  children: Layer[] = []
   constructor(attr: SceneType) {
-    Object.assign(sceneParam, attr)
     super()
-    this.setOption(attr)
+    Object.assign(sceneParam, {
+      container: attr.container,
+      camera: this.camera,
+      autoClear: attr.autoClear || this.autoClear,
+      autoCenter: attr.autoCenter || this.autoCenter
+    })
+    Object.assign(this, attr)
     if (this.autoCenter) {
-      const { viewportWidth, viewportHeight } = this.getViewPort()
-      this.camera.position.set(viewportWidth / 2, viewportHeight / 2)
+      const { clientWidth, clientHeight } = attr.container
+      this.camera.position.set(clientWidth / 2, clientHeight / 2)
     }
   }
 
-  /* 设置属性 */
-  setOption(attr: SceneType) {
-    for (const [key, val] of Object.entries(attr)) {
-      this[key] = val
+  /* 添加元素 */
+  add(...objs: Layer[]) {
+    for (const obj of objs) {
+      if (!obj.isLayer) {
+        return this
+      }
+      obj.parent && obj.remove()
+      obj.parent = this
+      this.children.push(obj)
+      this.dispatchEvent({ type: 'add', obj })
     }
+    this.sort()
+    return this
   }
 
+  /* 删除元素 */
+  remove(...objs: Layer[]) {
+    const { children } = this
+    for (const obj of objs) {
+      const index = children.indexOf(obj)
+      if (index !== -1) {
+        obj.parent = undefined
+        this.children.splice(index, 1)
+        this.dispatchEvent({ type: 'remove', obj })
+      }
+    }
+    return this
+  }
+
+  /* 清空children */
+  clear() {
+    for (const obj of this.children) {
+      obj.parent = undefined
+      this.dispatchEvent({ type: 'removed', obj })
+    }
+    this.children = []
+    return this
+  }
+
+  /* 排序 */
+  private sort() {
+    const { children } = this
+    children.sort((a, b) => {
+      return a.index - b.index
+    })
+  }
   /*  渲染 */
-  async render() {
-    const {
-      domElement: { width, height },
-      ctx,
-      camera,
-      children,
-      autoClear
-    } = this
-    ctx.save()
-    // 清理画布
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
-    autoClear && ctx.clearRect(0, 0, width, height)
-    ctx.fillStyle = '#f4f4f4'
-    ctx.fillRect(0, 0, width, height)
-
-    // 渲染子对象
-    for (const obj of children) {
-      ctx.save()
-      // 视图投影矩阵
-      obj.enableCamera && camera.transformInvert(ctx)
-      // 绘图
-      obj.draw(ctx)
-      ctx.restore()
+  render() {
+    const { children } = this
+    for (let i = 0; i < children.length; i++) {
+      const layer = children[i]
+      layer.render()
     }
-
-    ctx.restore()
+  }
+  getViewPort() {
+    const child = this.children[0]
+    return child.getViewPort()
+  }
+  setViewPort(width: number, height: number) {
+    const { children } = this
+    for (let i = 0; i < children.length; i++) {
+      const layer = children[i]
+      layer.setViewPort(width, height)
+    }
   }
 
   /* client坐标转canvas坐标 */
   clientToCanvas(clientX: number, clientY: number) {
-    const { domElement } = this
-    const { left, top } = domElement.getBoundingClientRect()
+    const { container } = this
+    const { left, top } = container.getBoundingClientRect()
     return new Vector2(clientX - left, clientY - top)
   }
   /* canvas坐标转client坐标*/
   canvasToClient(x: number, y: number): Vector2 {
-    const { domElement } = this
-    const { left, top } = domElement.getBoundingClientRect()
+    const { left, top } = this.container.getBoundingClientRect()
     return new Vector2(x + left, y + top)
   }
 
   /* canvas坐标转裁剪坐标 */
   canvastoClip({ x, y }: Vector2): Vector2 {
-    const { position } = this
-    return new Vector2(x - position.x, y - position.y)
+    return new Vector2(x, y)
   }
 
   /* client坐标转裁剪坐标 */
   clientToClip(clientX: number, clientY: number): Vector2 {
     return this.canvastoClip(this.clientToCanvas(clientX, clientY))
   }
+  /* canvas坐标转相机坐标 */
+  canvasToCoord(clientX: number, clientY: number): Vector2 {
+    const {
+      camera: { zoom, position }
+    } = this
+    return new Vector2(clientX, clientY).sub(position).divideScalar(zoom)
+  }
   /* client坐标转相机坐标 */
   clientToCoord(clientX: number, clientY: number): Vector2 {
-    const {
-      camera: { pvMatrixInvert }
-    } = this
-    return this.clientToClip(clientX, clientY).applyMatrix3(pvMatrixInvert)
+    return this.canvasToCoord(...this.clientToClip(clientX, clientY).toArray())
   }
-  /** 相机坐标转裁剪坐标 */
-  coordToClip(coord: Vector2): Vector2 {
+  /** 相机坐标转canvas坐标 */
+  coordToCanvas(coord: Vector2): Vector2 {
     const {
-      camera: { pvMatrix }
+      camera: { zoom, position }
     } = this
-    return coord.clone().applyMatrix3(pvMatrix)
+    return coord.clone().multiplyScalar(zoom).add(position)
+  }
+  /** 相机坐标转client坐标 */
+  coordToClient(coord: Vector2): Vector2 {
+    const {
+      camera: { zoom, position }
+    } = this
+    const { left, top } = this.container.getBoundingClientRect()
+    return coord
+      .clone()
+      .multiplyScalar(zoom)
+      .add(position)
+      .add(new Vector2(left, top))
   }
 
-  /* 基于某个坐标系，判断某个点是否在图形内 */
-  isPointInObj(obj: Object2D, mp: Vector2, matrix: Matrix3 = new Matrix3()) {
-    const { ctx } = this
-    ctx.save()
-    ctx.beginPath()
-    // 画布缩放了，这里进行矩阵计算时要调整回来
-    // ctx.scale(1 / dpr, 1 / dpr)
-    obj.crtPath(ctx, matrix)
-    ctx.restore()
-    return ctx.isPointInPath(mp.x, mp.y)
-  }
-  /* 选择图案 */
-  selectObj(mp: Vector2, imgGroup: Object2D[] = this.children): Img | null {
-    for (const img of [...imgGroup].reverse()) {
-      if (img instanceof Img && this.isPointInObj(img, mp, img.pvmoMatrix)) {
-        return img
-      }
+  /** 点位是否在图形中 */
+  isPointInGraph(point: Vector2, children = this.children): Object2D | false {
+    for (let i = 0; i < children.length; i++) {
+      const layer = children[i]
+      const obj = layer.isPointInGraph(point)
+      if (obj) return obj
     }
-    return null
+    return false
   }
 }

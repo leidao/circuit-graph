@@ -3,12 +3,13 @@
  * @Author: ldx
  * @Date: 2023-12-01 17:17:18
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-17 10:46:29
+ * @LastEditTime: 2023-12-18 16:50:39
  */
 
 import _ from 'lodash'
 
-import { Img, Line, OrbitControler, Scene, Vector2 } from '@/dxCanvas'
+import { Img, OrbitControler, Scene, Vector2 } from '@/dxCanvas'
+import { Layer } from '@/dxCanvas/objects/layer'
 import { Ruler } from '@/dxCanvas/objects/ruler'
 
 import KeybordManager from './command/keybordManger'
@@ -20,19 +21,17 @@ type Option = {
 export class Editor {
   /** 场景 */
   scene!: Scene
+  /** 图层 */
+  baseLayer!: Layer
+  dynamicLayer!: Layer
   /** 控制器 */
   orbitControler!: OrbitControler
-  option: Option
   /** 标尺 */
   ruler!: Ruler
   /** 鼠标按下时的位置 */
   mouseStart = new Vector2(Infinity)
   /** 是否按下鼠标 */
   isMousedown = false
-  /** 缩放速度 */
-  zoomSpeed = 1
-  /** 缩放比例 */
-  scale = 1
   /** canvas元素 */
   domElement!: HTMLDivElement
   /* 鼠标的裁剪坐标位 */
@@ -41,7 +40,6 @@ export class Editor {
   toolOperation = 'panning'
   /** 鼠标是否按下 */
   isPanning = false
-  line!: Line
   /** 选中的图片 */
   selectImg!: null | HTMLImageElement
   /** tool管理器 */
@@ -49,14 +47,17 @@ export class Editor {
   /** 快捷键管理器 */
   keybordManager!: KeybordManager
   constructor(option: Option) {
-    this.option = option
-    if (!this.option.container) return
+    if (!option.container) return
     // 场景相关
-    const container = this.option.container
+    const container = option.container
     // const canvas = document.createElement('canvas')
     // container.appendChild(canvas)
     this.domElement = container
     this.scene = new Scene({ container: container })
+    this.baseLayer = new Layer()
+    this.dynamicLayer = new Layer()
+    this.scene.add(this.baseLayer)
+    this.scene.add(this.dynamicLayer)
     this.listen()
     // 标尺相关
     const rulerConfig = {
@@ -66,7 +67,7 @@ export class Editor {
       h: 16 // 刻度线基础高度
     }
     this.ruler = new Ruler(rulerConfig)
-    this.scene.add(this.ruler)
+    this.dynamicLayer.add(this.ruler)
     // 控制器相关
     this.orbitControler = new OrbitControler(this.scene)
     this.orbitControler.maxZoom = 10
@@ -105,7 +106,11 @@ export class Editor {
   }
   /** 鼠标移动 */
   pointermove = _.throttle((event: PointerEvent) => {
+    const { clientX, clientY } = event
+    const mouseClipPos = this.scene.clientToCoord(clientX, clientY)
     this.toolManager.pointermove(event)
+    const obj = this.dynamicLayer.isPointInGraph(mouseClipPos)
+    console.log('obj', obj)
   }, 10)
   /** 鼠标松开 */
   pointerup = (event: PointerEvent) => {
@@ -116,7 +121,7 @@ export class Editor {
   }
 
   resize = _.throttle(() => {
-    const container = this.option.container
+    const container = this.scene.container
     const width = container.clientWidth
     const height = container.clientHeight
     this.scene.setViewPort(width, height)
@@ -148,7 +153,7 @@ export class Editor {
       size: new Vector2(70, 50),
       offset: new Vector2(70, 50).multiplyScalar(-0.5)
     })
-    this.scene.add(pattern)
+    this.baseLayer.add(pattern)
     this.scene.render()
   }
   /**  放大 */

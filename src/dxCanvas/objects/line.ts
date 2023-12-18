@@ -3,10 +3,11 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-16 17:51:48
+ * @LastEditTime: 2023-12-18 16:30:29
  */
 import { dpr } from '../core/camera'
 import { Matrix3 } from '../math/matrix3'
+import { Vector2 } from '../math/vector2'
 import { StandStyle, StandStyleType } from '../style/standStyle'
 import { Object2D, Object2DType } from './object2D'
 import { crtPath, crtPathByMatrix } from './objectUtils'
@@ -14,27 +15,20 @@ import { crtPath, crtPathByMatrix } from './objectUtils'
 type LineType = Object2DType & {
   style?: StandStyleType
   points?: [number, number][]
+  pickingBuffer?: number
 }
 
 export class Line extends Object2D {
   style: StandStyle = new StandStyle()
   /** 点位集合 */
   points: [number, number][] = []
+  /** 图层拾取缓存机制，如 1px 宽度的线鼠标很难拾取(点击)到, 通过设置该参数可扩大拾取的范围 */
+  pickingBuffer = 4
   // 类型
   readonly isLine = true
   constructor(attr: LineType = {}) {
     super()
     this.setOption(attr)
-  }
-
-  /* 世界模型矩阵*偏移矩阵 */
-  get moMatrix(): Matrix3 {
-    return this.worldMatrix
-  }
-
-  /* 视图投影矩阵*世界模型矩阵*偏移矩阵  */
-  get pvmoMatrix(): Matrix3 {
-    return this.pvmMatrix
   }
 
   /* 属性设置 */
@@ -79,14 +73,94 @@ export class Line extends Object2D {
     crtPath(ctx, flatPoints)
     ctx.stroke()
   }
+  /** 获取包围盒数据 */
+  computeBoundingBox() {
+    const {
+      points,
+      boundingBox: { min, max }
+    } = this
+    // 根据点计算边界
+    let minX = Infinity
+    let minY = Infinity
+    let maxX = -Infinity
+    let maxY = -Infinity
 
-  /* 绘制图像边界 */
-  crtPath(ctx: CanvasRenderingContext2D, matrix = this.pvmoMatrix) {
-    const { points, style } = this
-    //样式
-    style.apply(ctx)
-    // 绘制图像
-    const flatPoints = points.flat()
-    crtPath(ctx, flatPoints)
+    for (const [x, y] of points) {
+      minX = Math.min(minX, x)
+      minY = Math.min(minY, y)
+      maxX = Math.max(maxX, x)
+      maxY = Math.max(maxY, y)
+    }
+    min.set(minX, minY)
+    max.set(maxX, maxY)
+  }
+  /** 点位是否在图形中 */
+  isPointInGraph(point: Vector2): Line | false {
+    const isPointInBounds = this.isPointInBounds(point)
+    if (isPointInBounds) {
+      const { points, pickingBuffer } = this
+      const scene = this.getScene()
+      if (!scene) return false
+      for (let i = 0; i < points.length - 1; i++) {
+        const p1 = new Vector2(points[i][0], points[i][1])
+        const p2 = new Vector2(points[i + 1][0], points[i + 1][1])
+        // 这里转成像素来判断，鼠标范围更精确
+        const distance = this.calculateDistanceToLine(
+          scene?.coordToCanvas(point),
+          scene?.coordToCanvas(p1),
+          scene?.coordToCanvas(p2)
+        )
+        if (distance <= pickingBuffer) {
+          return this
+        }
+      }
+    }
+    return false
+  }
+
+  /**
+   * 计算点到直线的距离。
+   * @param point 点的坐标。
+   * @param p1 直线上的第一个点的坐标。
+   * @param p2 直线上的第二个点的坐标。
+   * @returns 点到直线的距离。
+   */
+  private calculateDistanceToLine(
+    point: Vector2,
+    p1: Vector2,
+    p2: Vector2
+  ): number {
+    const { x: x1, y: y1 } = p1
+    const { x: x2, y: y2 } = p2
+    const { x: x, y: y } = point
+
+    const A = x - x1
+    const B = y - y1
+    const C = x2 - x1
+    const D = y2 - y1
+
+    const dot = A * C + B * D
+    const lenSq = C * C + D * D
+    let param = -1
+    if (lenSq !== 0) {
+      param = dot / lenSq
+    }
+
+    let xx, yy
+
+    if (param < 0) {
+      xx = x1
+      yy = y1
+    } else if (param > 1) {
+      xx = x2
+      yy = y2
+    } else {
+      xx = x1 + param * C
+      yy = y1 + param * D
+    }
+
+    const dx = x - xx
+    const dy = y - yy
+    return Math.sqrt(dx * dx + dy * dy)
   }
 }

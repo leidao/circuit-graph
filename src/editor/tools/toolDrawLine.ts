@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-16 17:51:06
+ * @LastEditTime: 2023-12-18 12:34:20
  */
 import { Line } from '@/dxCanvas'
 
@@ -30,7 +30,7 @@ class ToolDrawLine extends ToolBase {
       const point = this.downPoint.toArray()
       const points: [number, number][] = [point]
       this.line = new Line({ points })
-      editor.scene.add(this.line)
+      editor.baseLayer.add(this.line)
     } else {
       const [[x, y]] = this.line.points.slice(-1)
       const deltaX = Math.abs(this.downPoint.x - x)

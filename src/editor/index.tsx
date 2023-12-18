@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2022-04-06 19:34:55
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-14 17:25:00
+ * @LastEditTime: 2023-12-17 12:55:12
  */
 import { useEffect, useRef, useState } from 'react'
 
@@ -126,7 +126,7 @@ const Home = () => {
           editor={editor}
         ></Tool>
         <div
-          className="absolute left-0px top-40px box-border w-100%"
+          className="absolute left-0px top-40px box-border w-100% bg-#f4f4f4"
           style={{
             height: 'calc(100% - 40px)'
           }}

@@ -3,13 +3,13 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-11 17:13:17
+ * @LastEditTime: 2023-12-18 16:38:38
  */
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
 import { BasicStyle, BasicStyleType } from '../style/basicStyle'
 import { Object2D, Object2DType } from './object2D'
-import { crtPathByMatrix } from './objectUtils'
+import { crtPath, crtPathByMatrix } from './objectUtils'
 
 type ImgType = Object2DType & {
   image?: CanvasImageSource
@@ -60,25 +60,24 @@ export class Img extends Object2D {
   }
 
   /* 世界模型矩阵*偏移矩阵 */
-  get moMatrix(): Matrix3 {
+  get worldMatrix(): Matrix3 {
     const {
       offset: { x, y }
     } = this
-    return this.worldMatrix.multiply(new Matrix3().makeTranslation(x, y))
+    return super.worldMatrix.multiply(new Matrix3().makeTranslation(x, y))
   }
 
   /* 视图投影矩阵*世界模型矩阵*偏移矩阵  */
-  get pvmoMatrix(): Matrix3 {
+  get pvmMatrix(): Matrix3 {
     const {
       offset: { x, y }
     } = this
-    return this.pvmMatrix.multiply(new Matrix3().makeTranslation(x, y))
+    return super.pvmMatrix.multiply(new Matrix3().makeTranslation(x, y))
   }
 
   /* 绘图 */
   drawShape(ctx: CanvasRenderingContext2D) {
     const { image, offset, size, view, style } = this
-
     //样式
     style.apply(ctx)
     /**
@@ -106,12 +105,18 @@ export class Img extends Object2D {
       ctx.drawImage(image, offset.x, offset.y, size.x, size.y)
     }
   }
-
-  /* 绘制图像边界 */
-  crtPath(ctx: CanvasRenderingContext2D, matrix = this.pvmoMatrix) {
+  /** 获取包围盒数据 */
+  computeBoundingBox() {
     const {
-      size: { x: imgW, y: imgH }
+      size: { x: imgW, y: imgH },
+      boundingBox: { min, max }
     } = this
-    crtPathByMatrix(ctx, [0, 0, imgW, 0, imgW, imgH, 0, imgH], matrix, true)
+    min.copy(new Vector2(0, 0).applyMatrix3(this.worldMatrix))
+    max.copy(new Vector2(imgW, imgH).applyMatrix3(this.worldMatrix))
+  }
+  /** 点位是否在图形中 */
+  isPointInGraph(point: Vector2): Img | false {
+    const isPointInBounds = this.isPointInBounds(point)
+    return isPointInBounds ? this : false
   }
 }

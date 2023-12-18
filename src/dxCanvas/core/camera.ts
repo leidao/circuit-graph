@@ -3,13 +3,14 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:28:05
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-11 09:26:25
+ * @LastEditTime: 2023-12-18 14:06:27
  */
 
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
 
 export const dpr = window.devicePixelRatio || 1
+// export const dpr = 1
 export class Camera {
   position: Vector2
   zoom: number
@@ -23,7 +24,9 @@ export class Camera {
       position: { x, y },
       zoom
     } = this
-    return new Matrix3().scale(zoom, zoom).translate(x, y)
+    return new Matrix3()
+      .scale(zoom * dpr, zoom * dpr)
+      .translate(x * dpr, y * dpr)
   }
   get pvMatrixInvert() {
     const {

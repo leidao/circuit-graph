@@ -67,22 +67,6 @@ class Text2D extends Object2D {
     return new Vector2(w, style.fontSize)
   }
 
-  /* 计算边界盒子 */
-  computeBoundingBox() {
-    const {
-      boundingBox: { min, max },
-      size,
-      offset,
-      style: { textAlign, textBaseline }
-    } = this
-
-    min.set(
-      offset.x + size.x * alignRatio[textAlign],
-      offset.y + size.y * baselineRatio[textBaseline]
-    )
-    max.addVectors(min, size)
-  }
-
   /* 绘图 */
   drawShape(ctx: CanvasRenderingContext2D) {
     const {
@@ -110,6 +94,27 @@ class Text2D extends Object2D {
       }
     } = this
     crtPathByMatrix(ctx, [x0, y0, x1, y0, x1, y1, x0, y1], matrix)
+  }
+
+  /* 计算边界盒子 */
+  computeBoundingBox() {
+    const {
+      boundingBox: { min, max },
+      size,
+      offset,
+      style: { textAlign, textBaseline }
+    } = this
+
+    min.set(
+      offset.x + size.x * alignRatio[textAlign],
+      offset.y + size.y * baselineRatio[textBaseline]
+    )
+    max.addVectors(min, size)
+  }
+  /** 点位是否在图形中 */
+  isPointInGraph(point: Vector2): Text2D | false {
+    const isPointInBounds = this.isPointInBounds(point)
+    return isPointInBounds ? this : false
   }
 }
 
