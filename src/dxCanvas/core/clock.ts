@@ -6,74 +6,57 @@
  * @LastEditTime: 2023-12-11 14:58:13
  */
 class Clock {
-  autoStart:boolean
+  autoStart: boolean
   startTime = 0
   oldTime = 0
   elapsedTime = 0
-  running = false;
+  running = false
   constructor(autoStart = true) {
-
-    this.autoStart = autoStart;
-
+    this.autoStart = autoStart
   }
 
   start() {
+    this.startTime = now()
 
-    this.startTime = now();
-
-    this.oldTime = this.startTime;
-    this.elapsedTime = 0;
-    this.running = true;
-
+    this.oldTime = this.startTime
+    this.elapsedTime = 0
+    this.running = true
   }
 
   stop() {
-
-    this.getElapsedTime();
-    this.running = false;
-    this.autoStart = false;
-
+    this.getElapsedTime()
+    this.running = false
+    this.autoStart = false
   }
 
   getElapsedTime() {
-
-    this.getDelta();
-    return this.elapsedTime;
-
+    this.getDelta()
+    return this.elapsedTime
   }
 
   getDelta() {
-
-    let diff = 0;
+    let diff = 0
 
     if (this.autoStart && !this.running) {
-
-      this.start();
-      return 0;
-
+      this.start()
+      return 0
     }
 
     if (this.running) {
+      const newTime = now()
 
-      const newTime = now();
+      diff = (newTime - this.oldTime) / 1000
+      this.oldTime = newTime
 
-      diff = (newTime - this.oldTime) / 1000;
-      this.oldTime = newTime;
-
-      this.elapsedTime += diff;
-
+      this.elapsedTime += diff
     }
 
-    return diff;
-
+    return diff
   }
-
 }
 
 function now() {
-
-  return (typeof performance === 'undefined' ? Date : performance).now(); // see #10732
-
+  return (typeof performance === 'undefined' ? Date : performance).now() // see #10732
 }
 
-export { Clock };
+export { Clock }

@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-18 16:27:10
+ * @LastEditTime: 2023-12-19 09:47:00
  */
 import { Camera, dpr } from '../core/camera'
 import { sceneParam } from '../core/scene'
@@ -83,6 +83,8 @@ export class Layer extends Group {
       obj.enableCamera && camera.transformInvert(ctx)
       // 绘图
       obj.draw(ctx)
+      // obj.crtPath(ctx)
+
       ctx.restore()
     }
 

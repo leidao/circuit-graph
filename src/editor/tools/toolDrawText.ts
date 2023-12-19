@@ -3,92 +3,108 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-16 17:52:43
+ * @LastEditTime: 2023-12-19 11:03:28
  */
-import { Line, Text2D } from '@/dxCanvas'
+import { Animation, Line, Text2D, Vector2 } from '@/dxCanvas'
 
 import { Editor } from '../editor'
 import ToolBase from './toolBase'
 class ToolDrawText extends ToolBase {
   readonly keyboard = ''
-  readonly type = 'drawLine'
-  line: Line | null = null
-  direction: 'x' | 'y' = 'x'
-  /** 鼠标按下后是否移动过 */
-  isMoveInDown = false
+  readonly type = 'drawText'
+  text: Text2D | null = null
+  input = document.createElement('input')
+  cursor = new Line()
+  animation: Animation
   constructor(editor: Editor) {
     super(editor)
+    this.cursor.setPoints([
+      [0, 10],
+      [0, -10]
+    ])
+    editor.dynamicLayer.add(this.cursor)
+    this.animation = new Animation((time) => {
+      const num = time.toString().replace(/^\d+\./, '0.')
+      Number(num) <= 0.5 ? this.cursor.show() : this.cursor.hide()
+      editor.dynamicLayer.render()
+    })
+    //
+    this.input.style.position = 'absolute'
+    // this.input.style.width = '1000px'
+    this.input.style.height = '17.376px'
+    this.input.style.opacity = '0'
+    const a = (e: Event) => {
+      if (e.target && this.text) {
+        const { size, offset } = this.text
+        const value = (e.target as HTMLInputElement).value
+        this.text.text = value
+        const { min, max } = this.text.boundingBox
+
+        const pixelMin = editor.scene.coordToCanvas(min)
+        const pixelMax = editor.scene.coordToCanvas(max)
+        const deltaX = pixelMax.x - pixelMin.x
+        const deltaY = pixelMax.y - pixelMin.y
+        // this.cursor.style.left = `${this.downPoint.x + offset.x + deltaX}px`
+        // this.cursor.style.top = `${this.downPoint.y}px`
+        // this.input.style.transform = `translate(${
+        //   this.downPoint.x + offset.x + deltaX
+        // }px, -50%)`
+        // this.cursor.style.transform = `scaleY(${editor.scene.camera.zoom})`
+        // ;(e.target as HTMLInputElement).value = ''
+        editor.scene.render()
+        console.log('xxxx', value)
+      }
+    }
+    this.input.addEventListener('input', a)
   }
   /** 鼠标按下 */
   pointerdown(event: PointerEvent) {
     const { editor } = this
     const { clientX, clientY } = event
     this.isDown = true
-    this.isMoveInDown = false
-    this.downPoint.copy(editor.scene.clientToCoord(clientX, clientY))
-    if (!this.line) {
-      const point = this.downPoint.toArray()
-      const points: [number, number][] = [point]
-      this.line = new Line({ points })
-      editor.scene.add(this.line)
-    } else {
-      const [[x, y]] = this.line.points.slice(-1)
-      const deltaX = Math.abs(this.downPoint.x - x)
-      const deltaY = Math.abs(this.downPoint.y - y)
-      const max = Math.max(deltaX, deltaY)
-      const mouseX = max === deltaX ? this.downPoint.x : x
-      const mouseY = max === deltaY ? this.downPoint.y : y
-      this.line.addPoints([mouseX, mouseY])
-    }
-    editor.scene.render()
+    this.downPoint = editor.scene.clientToCanvas(clientX, clientY)
+    // this.cursor.style.left = `${this.downPoint.x}px`
+    // this.cursor.style.top = `${this.downPoint.y}px`
+    this.animation.start()
+    this.text = new Text2D({
+      text: '',
+      style: {
+        fontSize: 12,
+        fillStyle: '#000',
+        textAlign: 'left',
+        textBaseline: 'middle'
+      },
+      position: editor.scene.clientToCoord(clientX, clientY)
+    })
+    editor.baseLayer.add(this.text)
+
+    // editor.scene.render()
   }
   /** 鼠标移动 */
   pointermove(event: PointerEvent) {
     const { editor } = this
-    const { clientX, clientY } = event
-    // 没有先点击起点的话，不用绘制线段
-    if (this.downPoint.isEmpty()) return
-    this.dragPoint.copy(editor.scene.clientToCoord(clientX, clientY))
-    if (this.line) {
-      const sub = this.dragPoint.clone().sub(this.downPoint)
-      const pixelDelta = sub.multiplyScalar(editor.scene.camera.zoom)
-      if (pixelDelta.length() < 50) {
-        // 判断线段绘制方向
-        this.direction =
-          Math.abs(pixelDelta.x) > Math.abs(pixelDelta.y) ? 'x' : 'y'
-      }
-      // 计算中间过渡点位坐标
-      const mouseX =
-        this.direction === 'x' ? this.dragPoint.x : this.downPoint.x
-      const mouseY =
-        this.direction === 'y' ? this.dragPoint.y : this.downPoint.y
-      // 鼠标按下后第一次移动，先添加两个点位，后面再移动直接替换点位
-      if (!this.isMoveInDown) {
-        this.line.addPoints([mouseX, mouseY], this.dragPoint.toArray())
-      }
-      this.line.replacePoints(-2, 2, [mouseX, mouseY], this.dragPoint.toArray())
-
-      editor.scene.render()
-    }
-    this.isMoveInDown = true
   }
   /** 鼠标松开 */
   pointerup() {
-    this.isDown = false
+    // this.isDown = false
   }
-  finish = () => {
-    if (this.isMoveInDown) {
-      this.line?.replacePoints(-2, 2)
-    }
-    this.line = null
-    this.editor.scene.render()
+  finish = () => {}
+  active() {
+    this.activeKeyboard()
+    // this.editor.domElement.appendChild(this.input)
+  }
+  inactive() {
+    this.inactiveKeyboard()
+    // this.editor.domElement.removeChild(this.input)
   }
   /** 激活快捷键 */
   activeKeyboard() {
     this.editor.keybordManager.registry({
       name: 'drawLineFinish',
       keyboard: ['enter'],
-      execute: this.finish
+      execute: () => {
+        //
+      }
     })
   }
   inactiveKeyboard() {

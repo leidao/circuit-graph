@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-18 16:55:42
+ * @LastEditTime: 2023-12-19 09:32:35
  */
 import { Vector2 } from '../math/vector2'
 import { Object2D, Object2DType } from './object2D'

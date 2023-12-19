@@ -1,3 +1,4 @@
+import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
 import { TextStyle, TextStyleType } from '../style/textStyle'
 import { Object2D, Object2DType } from './object2D'
@@ -46,6 +47,21 @@ class Text2D extends Object2D {
     super()
     this.setOption(attr)
   }
+  /* 世界模型矩阵*偏移矩阵 */
+  get worldMatrix(): Matrix3 {
+    const {
+      offset: { x, y }
+    } = this
+    return super.worldMatrix.multiply(new Matrix3().makeTranslation(x, y))
+  }
+
+  /* 视图投影矩阵*世界模型矩阵*偏移矩阵  */
+  get pvmMatrix(): Matrix3 {
+    const {
+      offset: { x, y }
+    } = this
+    return super.pvmMatrix.multiply(new Matrix3().makeTranslation(x, y))
+  }
 
   /* 属性设置 */
   setOption(attr: TextType) {
@@ -84,18 +100,6 @@ class Text2D extends Object2D {
     }
   }
 
-  /* 绘制图像边界 */
-  crtPath(ctx: CanvasRenderingContext2D, matrix = this.pvmMatrix) {
-    this.computeBoundingBox()
-    const {
-      boundingBox: {
-        min: { x: x0, y: y0 },
-        max: { x: x1, y: y1 }
-      }
-    } = this
-    crtPathByMatrix(ctx, [x0, y0, x1, y0, x1, y1, x0, y1], matrix)
-  }
-
   /* 计算边界盒子 */
   computeBoundingBox() {
     const {
@@ -105,11 +109,13 @@ class Text2D extends Object2D {
       style: { textAlign, textBaseline }
     } = this
 
-    min.set(
+    const a = new Vector2(
       offset.x + size.x * alignRatio[textAlign],
       offset.y + size.y * baselineRatio[textBaseline]
     )
-    max.addVectors(min, size)
+    const b = new Vector2().addVectors(a, size)
+    min.copy(a.applyMatrix3(this.worldMatrix))
+    max.copy(b.applyMatrix3(this.worldMatrix))
   }
   /** 点位是否在图形中 */
   isPointInGraph(point: Vector2): Text2D | false {

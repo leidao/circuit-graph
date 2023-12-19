@@ -3,28 +3,28 @@
  * @Author: ldx
  * @Date: 2023-12-11 15:03:42
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-11 15:28:44
+ * @LastEditTime: 2023-12-19 10:50:43
  */
 
-import { Clock } from "./clock"
+import { Clock } from './clock'
 
-class Animation{
-  animationId:number | null = null
+class Animation {
+  animationId: number | null = null
   stopAnimation = false
-  fn:(time:number)=>void
+  fn: (time: number) => void
   clock = new Clock()
-  constructor(fn: (time: number) => void){
+  constructor(fn: (time: number) => void) {
     this.fn = fn
   }
-  start=()=>{
+  start = () => {
     if (this.stopAnimation) return
     const time = this.clock.getElapsedTime()
     this.fn(time)
     this.animationId = requestAnimationFrame(this.start)
   }
-  stop=()=>{
+  stop = () => {
     this.stopAnimation = true
-    if(this.animationId){
+    if (this.animationId) {
       cancelAnimationFrame(this.animationId)
     }
     this.stopAnimation = false

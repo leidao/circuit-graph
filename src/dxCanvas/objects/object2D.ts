@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-18 16:46:38
+ * @LastEditTime: 2023-12-19 10:58:29
  */
 import { EventDispatcher } from '../core/eventDispatcher'
 import { Scene } from '../core/scene'
@@ -27,6 +27,10 @@ export type Object2DType = {
   [key: string]: any
 }
 
+type boundingBox = {
+  min: Vector2
+  max: Vector2
+}
 export abstract class Object2D extends EventDispatcher {
   /** 自定义属性 */
   [key: string]: any
@@ -133,7 +137,7 @@ export abstract class Object2D extends EventDispatcher {
   show() {
     this.visible = true
   }
-  hidden() {
+  hide() {
     this.visible = false
   }
 
@@ -170,10 +174,12 @@ export abstract class Object2D extends EventDispatcher {
     const flag = this.isGrapBounshInViewport(this, viewportBounds)
     if (!flag) return
     ctx.save()
+
     /*  矩阵变换 */
     this.transform(ctx)
     /* 绘制图形 */
     this.drawShape(ctx)
+
     ctx.restore()
   }
 
@@ -186,8 +192,7 @@ export abstract class Object2D extends EventDispatcher {
       }
     } = this
     crtPath(ctx, [x0, y0, x1, y0, x1, y1, x0, y1], true)
-
-    // ctx.stroke()
+    ctx.stroke()
   }
   /** 点位是否在包围盒 */
   isPointInBounds({ x, y }: Vector2, boundingBox = this.boundingBox) {
@@ -199,26 +204,18 @@ export abstract class Object2D extends EventDispatcher {
   }
 
   /** 图形的包围盒是否在视口内 */
-  isGrapBounshInViewport(
-    obj: Object2D,
-    viewportBounds: {
-      min: Vector2
-      max: Vector2
-    }
-  ) {
-    const {
-      boundingBox: {
-        min: { x: x0, y: y0 },
-        max: { x: x1, y: y1 }
-      }
-    } = obj
-    const bounds = [
-      new Vector2(x0, y0),
-      new Vector2(x1, y0),
-      new Vector2(x1, y1),
-      new Vector2(x0, y1)
-    ]
-    return bounds.some((vert) => this.isPointInBounds(vert, viewportBounds))
+  isGrapBounshInViewport(obj: Object2D, viewportBounds: boundingBox) {
+    const { boundingBox } = obj
+    return this.isBoundingBoxIntersect(viewportBounds, boundingBox)
+  }
+  /** 判断两个包围盒是否相交 */
+  isBoundingBoxIntersect(box1: boundingBox, box2: boundingBox) {
+    return (
+      box1.min.x <= box2.max.x &&
+      box1.max.x >= box2.min.x &&
+      box1.min.y <= box2.max.y &&
+      box1.max.y >= box2.min.y
+    )
   }
 
   /* 绘制图形-接口 */

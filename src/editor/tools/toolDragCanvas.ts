@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-09 20:52:08
+ * @LastEditTime: 2023-12-18 20:54:37
  */
 import { Line } from '@/dxCanvas'
 
@@ -27,6 +27,12 @@ class ToolDragCanvas extends ToolBase {
   /** 鼠标松开 */
   pointerup() {
     this.editor.orbitControler.pointerup()
+  }
+  active() {
+    //
+  }
+  inactive() {
+    //
   }
 }
 export default ToolDragCanvas

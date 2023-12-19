@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-14 16:15:05
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-16 17:49:49
+ * @LastEditTime: 2023-12-18 20:54:07
  */
 import { Vector2 } from '@/dxCanvas'
 
@@ -29,18 +29,10 @@ abstract class ToolBase {
   abstract pointermove(event: PointerEvent): void
   /** 鼠标松开 */
   abstract pointerup(event: PointerEvent): void
-  /** 激活快捷键 */
-  activeKeyboard() {}
-  /** 取消快捷键激活 */
-  inactiveKeyboard() {}
   /** 激活 */
-  active() {
-    this.activeKeyboard()
-  }
+  abstract active(): void
   /** 失活 */
-  inactive() {
-    this.inactiveKeyboard()
-  }
+  abstract inactive(): void
 }
 
 export default ToolBase

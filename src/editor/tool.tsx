@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2022-04-06 19:34:55
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-14 16:17:05
+ * @LastEditTime: 2023-12-18 17:45:34
  */
 import { Dropdown, InputNumber, Space } from 'antd'
 import { useState } from 'react'
@@ -63,8 +63,8 @@ const Tool: React.FC<Props> = ({ className, editor }) => {
       <div className="flex-1 flex items-center ">
         <div
           className="cursor-pointer w-32px h-32px hover:bg-#f2f2f2  rounded-6px flex justify-center items-center ml-10px"
-          style={styleFn('selected')}
-          onClick={() => setActive('selected')}
+          style={styleFn('selectGraph')}
+          onClick={() => setActive('selectGraph')}
         >
           <SelectOutlined></SelectOutlined>
         </div>

@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-18 16:30:29
+ * @LastEditTime: 2023-12-18 17:36:02
  */
 import { dpr } from '../core/camera'
 import { Matrix3 } from '../math/matrix3'
@@ -77,7 +77,8 @@ export class Line extends Object2D {
   computeBoundingBox() {
     const {
       points,
-      boundingBox: { min, max }
+      boundingBox: { min, max },
+      pickingBuffer
     } = this
     // 根据点计算边界
     let minX = Infinity
@@ -91,9 +92,29 @@ export class Line extends Object2D {
       maxX = Math.max(maxX, x)
       maxY = Math.max(maxY, y)
     }
+
     min.set(minX, minY)
     max.set(maxX, maxY)
+    const scene = this.getScene()
+    if (!scene) return
+    if (minX !== Infinity && minY !== Infinity) {
+      const minPixel = scene.coordToCanvas(new Vector2(minX, minY))
+      const minCoord = scene.canvasToCoord(
+        minPixel.x - pickingBuffer,
+        minPixel.y - pickingBuffer
+      )
+      min.copy(minCoord)
+    }
+    if (maxX !== Infinity && maxY !== Infinity) {
+      const maxPixel = scene.coordToCanvas(new Vector2(maxX, maxY))
+      const maxCoord = scene.canvasToCoord(
+        maxPixel.x + pickingBuffer,
+        maxPixel.y + pickingBuffer
+      )
+      max.copy(maxCoord)
+    }
   }
+
   /** 点位是否在图形中 */
   isPointInGraph(point: Vector2): Line | false {
     const isPointInBounds = this.isPointInBounds(point)
@@ -110,7 +131,7 @@ export class Line extends Object2D {
           scene?.coordToCanvas(p1),
           scene?.coordToCanvas(p2)
         )
-        if (distance <= pickingBuffer) {
+        if (Math.abs(distance) <= pickingBuffer) {
           return this
         }
       }

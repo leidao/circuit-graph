@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-01 17:17:18
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-18 16:50:39
+ * @LastEditTime: 2023-12-19 09:28:09
  */
 
 import _ from 'lodash'
@@ -109,8 +109,8 @@ export class Editor {
     const { clientX, clientY } = event
     const mouseClipPos = this.scene.clientToCoord(clientX, clientY)
     this.toolManager.pointermove(event)
-    const obj = this.dynamicLayer.isPointInGraph(mouseClipPos)
-    console.log('obj', obj)
+    const obj = this.baseLayer.isPointInGraph(mouseClipPos)
+    // console.log('obj', obj)
   }, 10)
   /** 鼠标松开 */
   pointerup = (event: PointerEvent) => {

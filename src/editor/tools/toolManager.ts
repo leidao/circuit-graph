@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 09:38:54
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-09 20:52:42
+ * @LastEditTime: 2023-12-18 20:41:11
  */
 /*
  * @Description:
@@ -16,10 +16,12 @@
 import { EventDispatcher } from '@/dxCanvas/core/eventDispatcher'
 
 import { Editor } from '../editor'
+import cursorDefault from './cursor-images/suika-cursor-default.png'
 import ToolBase from './toolBase'
 import ToolDragCanvas from './toolDragCanvas'
 import ToolDrawLine from './toolDrawLine'
-
+import ToolDrawText from './toolDrawText'
+import ToolSelectGraph from './toolSelectGraph'
 class ToolManager extends EventDispatcher {
   toolMap = new Map<string, ToolBase>()
   /**
@@ -34,6 +36,8 @@ class ToolManager extends EventDispatcher {
     super()
     this.register(new ToolDragCanvas(editor))
     this.register(new ToolDrawLine(editor))
+    this.register(new ToolSelectGraph(editor))
+    this.register(new ToolDrawText(editor))
   }
   /** 注册 */
   register(tool: ToolBase) {
@@ -74,6 +78,7 @@ class ToolManager extends EventDispatcher {
     }
 
     activeTool.active()
+    this.setCursor()
     this.dispatchEvent({ type: 'tool_active', event: activeTool.type })
   }
   getActiveToolName() {
@@ -95,6 +100,21 @@ class ToolManager extends EventDispatcher {
   pointerup = (event: PointerEvent) => {
     if (this.activeTool) {
       this.activeTool.pointerup(event)
+    }
+  }
+  /** 设置鼠标样式 */
+  setCursor() {
+    if (!this.activeTool) return
+    switch (this.activeTool.type) {
+      case 'selectGraph':
+        this.editor.domElement.style.cursor = `url(${cursorDefault}) 5 5,auto`
+        break
+      case 'dragCanvas':
+        this.editor.domElement.style.cursor = 'grab'
+        break
+      default:
+        this.editor.domElement.style.cursor = 'crosshair'
+        break
     }
   }
   listen() {
