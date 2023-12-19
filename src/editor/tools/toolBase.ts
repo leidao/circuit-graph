@@ -3,11 +3,12 @@
  * @Author: ldx
  * @Date: 2023-12-14 16:15:05
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-18 20:54:07
+ * @LastEditTime: 2023-12-19 14:32:54
  */
 import { Vector2 } from '@/dxCanvas'
 
 import { Editor } from '../editor'
+import ToolManager from './toolManager'
 
 abstract class ToolBase {
   /** 快捷键 */
@@ -22,7 +23,7 @@ abstract class ToolBase {
   isDragging = false
   /** 是否按下 */
   isDown = false
-  constructor(public editor: Editor) {}
+  constructor(public editor: Editor, public manager: ToolManager) {}
   /** 鼠标按下 */
   abstract pointerdown(event: PointerEvent): void
   /** 鼠标移动 */

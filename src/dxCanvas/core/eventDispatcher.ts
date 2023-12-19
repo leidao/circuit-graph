@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:18:35
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-02 17:32:39
+ * @LastEditTime: 2023-12-19 14:38:26
  */
 /* 事件对象的类型 */
 export type CustomEvent = {

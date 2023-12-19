@@ -229,10 +229,12 @@ export class Ruler extends Object2D {
     const {
       boundingBox: { min, max }
     } = this
-    const layer = this.getLayer()
-    if (!layer) return
-    const { viewportWidth, viewportHeight } = layer?.getViewPort()
-    min.set(-viewportWidth / 2, -viewportHeight / 2)
-    max.set(viewportWidth / 2, viewportHeight / 2)
+    const scene = this.getScene()
+    if (!scene) return { min: new Vector2(), max: new Vector2() }
+    const { viewportHeight, viewportWidth } = scene.getViewPort()
+    const viewportMin = scene.canvasToCoord(0, 0)
+    const viewportmax = scene.canvasToCoord(viewportWidth, viewportHeight)
+    min.copy(viewportMin)
+    max.copy(viewportmax)
   }
 }

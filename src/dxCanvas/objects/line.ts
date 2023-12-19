@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-18 17:36:02
+ * @LastEditTime: 2023-12-19 15:12:08
  */
 import { dpr } from '../core/camera'
 import { Matrix3 } from '../math/matrix3'
@@ -95,10 +95,13 @@ export class Line extends Object2D {
 
     min.set(minX, minY)
     max.set(maxX, maxY)
+    min.applyMatrix3(this.worldMatrix)
+    max.applyMatrix3(this.worldMatrix)
+
     const scene = this.getScene()
     if (!scene) return
     if (minX !== Infinity && minY !== Infinity) {
-      const minPixel = scene.coordToCanvas(new Vector2(minX, minY))
+      const minPixel = scene.coordToCanvas(min)
       const minCoord = scene.canvasToCoord(
         minPixel.x - pickingBuffer,
         minPixel.y - pickingBuffer
@@ -106,7 +109,7 @@ export class Line extends Object2D {
       min.copy(minCoord)
     }
     if (maxX !== Infinity && maxY !== Infinity) {
-      const maxPixel = scene.coordToCanvas(new Vector2(maxX, maxY))
+      const maxPixel = scene.coordToCanvas(max)
       const maxCoord = scene.canvasToCoord(
         maxPixel.x + pickingBuffer,
         maxPixel.y + pickingBuffer

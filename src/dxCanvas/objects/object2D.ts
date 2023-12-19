@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 10:58:29
+ * @LastEditTime: 2023-12-19 15:13:04
  */
 import { EventDispatcher } from '../core/eventDispatcher'
 import { Scene } from '../core/scene'
@@ -173,8 +173,8 @@ export abstract class Object2D extends EventDispatcher {
     const viewportBounds = this.viewportBounds
     const flag = this.isGrapBounshInViewport(this, viewportBounds)
     if (!flag) return
-    ctx.save()
 
+    ctx.save()
     /*  矩阵变换 */
     this.transform(ctx)
     /* 绘制图形 */

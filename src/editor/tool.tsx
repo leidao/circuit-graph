@@ -3,10 +3,10 @@
  * @Author: ldx
  * @Date: 2022-04-06 19:34:55
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-18 17:45:34
+ * @LastEditTime: 2023-12-19 14:38:44
  */
 import { Dropdown, InputNumber, Space } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Editor } from './editor'
 import {
@@ -23,8 +23,16 @@ type Props = {
 const Tool: React.FC<Props> = ({ className, editor }) => {
   const [selected, setSelected] = useState('panning')
   const [open, setOpen] = useState(false)
-  if (!editor) return <div></div>
-  // useEffect(() => {}, [])
+  useEffect(() => {
+    if (!editor) return
+    const fn = () => {
+      setActive('selectGraph')
+    }
+    editor.toolManager.addEventListener('finish', fn)
+    return () => {
+      editor.toolManager.removeEventListener('finish', fn)
+    }
+  }, [editor])
   /** 改变画布缩放大小 */
   const zoomChange = () => {}
   const items: any = [
@@ -44,9 +52,9 @@ const Tool: React.FC<Props> = ({ className, editor }) => {
     {
       label: '放大',
       key: '2',
-      onClick: editor.zoomIn
+      onClick: () => editor?.zoomIn()
     },
-    { label: '缩小', key: '3', onClick: editor.zoomOut }
+    { label: '缩小', key: '3', onClick: () => editor?.zoomOut }
   ]
   const styleFn = (value: string) => {
     return {
@@ -55,6 +63,7 @@ const Tool: React.FC<Props> = ({ className, editor }) => {
     }
   }
   const setActive = (toolName: string) => {
+    if (!editor) return
     setSelected(toolName)
     editor.toolManager.setActiveTool(toolName)
   }

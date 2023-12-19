@@ -3,7 +3,7 @@ import { Vector2 } from '../math/vector2'
 import { TextStyle, TextStyleType } from '../style/textStyle'
 import { Object2D, Object2DType } from './object2D'
 import { crtPathByMatrix } from './objectUtils'
-
+const chineseRegex = /[\u4e00-\u9fa5]/
 /* 构造参数的类型 */
 type TextType = Object2DType & {
   text?: string
@@ -78,7 +78,18 @@ class Text2D extends Object2D {
   get size(): Vector2 {
     const { style, text, maxWidth } = this
     style.setFont(virtuallyCtx)
-    const { width } = virtuallyCtx.measureText(text)
+
+    // const width = virtuallyCtx.measureText(text).width
+    // const w = maxWidth === undefined ? width : Math.min(width, maxWidth)
+    let width = 0
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i]
+      const flag = chineseRegex.test(char)
+      const charWidth = virtuallyCtx.measureText(char).width
+      width += flag ? charWidth : Number(charWidth.toFixed(2))
+    }
+    // console.log('=====', width, virtuallyCtx.measureText(text).width)
+
     const w = maxWidth === undefined ? width : Math.min(width, maxWidth)
     return new Vector2(w, style.fontSize)
   }

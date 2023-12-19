@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 09:38:54
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-18 20:41:11
+ * @LastEditTime: 2023-12-19 14:31:06
  */
 /*
  * @Description:
@@ -34,10 +34,10 @@ class ToolManager extends EventDispatcher {
   enableSwitchTool = true
   constructor(private editor: Editor) {
     super()
-    this.register(new ToolDragCanvas(editor))
-    this.register(new ToolDrawLine(editor))
-    this.register(new ToolSelectGraph(editor))
-    this.register(new ToolDrawText(editor))
+    this.register(new ToolDragCanvas(editor, this))
+    this.register(new ToolDrawLine(editor, this))
+    this.register(new ToolSelectGraph(editor, this))
+    this.register(new ToolDrawText(editor, this))
   }
   /** 注册 */
   register(tool: ToolBase) {
@@ -74,12 +74,12 @@ class ToolManager extends EventDispatcher {
 
     if (prevTool) {
       prevTool.inactive()
-      this.dispatchEvent({ type: 'tool_inactive', event: prevTool.type })
+      this.dispatchEvent({ type: 'tool_inactive', target: prevTool })
     }
 
     activeTool.active()
     this.setCursor()
-    this.dispatchEvent({ type: 'tool_active', event: activeTool.type })
+    this.dispatchEvent({ type: 'tool_active', target: activeTool })
   }
   getActiveToolName() {
     return this.activeTool?.type

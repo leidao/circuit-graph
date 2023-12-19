@@ -3,12 +3,13 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-18 20:57:18
+ * @LastEditTime: 2023-12-19 14:35:03
  */
 import { Line } from '@/dxCanvas'
 
 import { Editor } from '../editor'
 import ToolBase from './toolBase'
+import ToolManager from './toolManager'
 class ToolDrawLine extends ToolBase {
   readonly keyboard = ''
   readonly type = 'drawLine'
@@ -16,8 +17,8 @@ class ToolDrawLine extends ToolBase {
   direction: 'x' | 'y' = 'x'
   /** 鼠标按下后是否移动过 */
   isMoveInDown = false
-  constructor(editor: Editor) {
-    super(editor)
+  constructor(editor: Editor, manager: ToolManager) {
+    super(editor, manager)
   }
   /** 鼠标按下 */
   pointerdown(event: PointerEvent) {

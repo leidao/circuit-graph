@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 09:32:35
+ * @LastEditTime: 2023-12-19 14:28:16
  */
 import { Vector2 } from '../math/vector2'
 import { Object2D, Object2DType } from './object2D'
@@ -33,7 +33,7 @@ export class Group extends Object2D {
       obj.parent && obj.remove()
       obj.parent = this
       this.children.push(obj)
-      this.dispatchEvent({ type: 'add', obj })
+      this.dispatchEvent({ type: 'add', target: obj })
     }
     this.sort()
     return this
@@ -47,7 +47,7 @@ export class Group extends Object2D {
       if (index !== -1) {
         obj.parent = undefined
         this.children.splice(index, 1)
-        this.dispatchEvent({ type: 'remove', obj })
+        this.dispatchEvent({ type: 'remove', target: obj })
       } else {
         for (const child of children) {
           if (child instanceof Group) {
@@ -63,7 +63,7 @@ export class Group extends Object2D {
   clear() {
     for (const obj of this.children) {
       obj.parent = undefined
-      this.dispatchEvent({ type: 'removed', obj })
+      this.dispatchEvent({ type: 'removed', target: obj })
     }
     this.children = []
     return this
