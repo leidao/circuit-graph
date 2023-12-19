@@ -3,14 +3,12 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 15:12:08
+ * @LastEditTime: 2023-12-19 15:56:17
  */
-import { dpr } from '../core/camera'
-import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
 import { StandStyle, StandStyleType } from '../style/standStyle'
 import { Object2D, Object2DType } from './object2D'
-import { crtPath, crtPathByMatrix } from './objectUtils'
+import { crtPath } from './objectUtils'
 
 type LineType = Object2DType & {
   style?: StandStyleType

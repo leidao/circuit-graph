@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2022-04-06 19:34:55
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 14:38:44
+ * @LastEditTime: 2023-12-19 15:24:15
  */
 import { Dropdown, InputNumber, Space } from 'antd'
 import { useEffect, useState } from 'react'
@@ -21,10 +21,11 @@ type Props = {
   editor: Editor | undefined
 }
 const Tool: React.FC<Props> = ({ className, editor }) => {
-  const [selected, setSelected] = useState('panning')
+  const [selected, setSelected] = useState('')
   const [open, setOpen] = useState(false)
   useEffect(() => {
     if (!editor) return
+    setActive('selectGraph')
     const fn = () => {
       setActive('selectGraph')
     }

@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 15:13:04
+ * @LastEditTime: 2023-12-19 15:51:03
  */
 import { EventDispatcher } from '../core/eventDispatcher'
 import { Scene } from '../core/scene'
@@ -185,12 +185,14 @@ export abstract class Object2D extends EventDispatcher {
 
   /* 绘制图像边界 */
   crtPath(ctx: CanvasRenderingContext2D) {
+    if (!this.visible) return
     const {
       boundingBox: {
         min: { x: x0, y: y0 },
         max: { x: x1, y: y1 }
       }
     } = this
+    ctx.beginPath()
     crtPath(ctx, [x0, y0, x1, y0, x1, y1, x0, y1], true)
     ctx.stroke()
   }

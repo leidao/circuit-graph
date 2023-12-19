@@ -39,6 +39,7 @@ class Text2D extends Object2D {
   maxWidth: number | undefined
   style: TextStyle = new TextStyle()
   offset = new Vector2(0, 0)
+  pickingBuffer = 4
 
   // 类型
   readonly isText = true
@@ -117,7 +118,8 @@ class Text2D extends Object2D {
       boundingBox: { min, max },
       size,
       offset,
-      style: { textAlign, textBaseline }
+      style: { textAlign, textBaseline },
+      pickingBuffer
     } = this
 
     const a = new Vector2(
@@ -127,6 +129,21 @@ class Text2D extends Object2D {
     const b = new Vector2().addVectors(a, size)
     min.copy(a.applyMatrix3(this.worldMatrix))
     max.copy(b.applyMatrix3(this.worldMatrix))
+
+    const scene = this.getScene()
+    if (!scene) return
+    const minPixel = scene.coordToCanvas(min)
+    const minCoord = scene.canvasToCoord(
+      minPixel.x - pickingBuffer,
+      minPixel.y - pickingBuffer
+    )
+    min.copy(minCoord)
+    const maxPixel = scene.coordToCanvas(max)
+    const maxCoord = scene.canvasToCoord(
+      maxPixel.x + pickingBuffer,
+      maxPixel.y + pickingBuffer
+    )
+    max.copy(maxCoord)
   }
   /** 点位是否在图形中 */
   isPointInGraph(point: Vector2): Text2D | false {

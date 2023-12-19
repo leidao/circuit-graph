@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 14:35:03
+ * @LastEditTime: 2023-12-19 16:25:58
  */
 import { Line } from '@/dxCanvas'
 
@@ -83,6 +83,7 @@ class ToolDrawLine extends ToolBase {
     }
     this.line = null
     this.editor.scene.render()
+    this.manager.dispatchEvent({ type: 'finish', target: this })
   }
   active() {
     this.activeKeyboard()

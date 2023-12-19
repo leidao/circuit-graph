@@ -3,9 +3,9 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 14:34:45
+ * @LastEditTime: 2023-12-19 16:26:43
  */
-import { Line } from '@/dxCanvas'
+import { BoxHelper, Line } from '@/dxCanvas'
 
 import { Editor } from '../editor'
 import ToolBase from './toolBase'
@@ -14,8 +14,10 @@ class ToolSelectGraph extends ToolBase {
   readonly keyboard = ''
   readonly type = 'selectGraph'
   line: Line | null = null
+  boxHelper = new BoxHelper({ style: { strokeStyle: '#0d90ff' } })
   constructor(editor: Editor, manager: ToolManager) {
     super(editor, manager)
+    editor.dynamicLayer.add(this.boxHelper)
   }
   /** 鼠标按下 */
   pointerdown(event: PointerEvent) {}
@@ -24,7 +26,11 @@ class ToolSelectGraph extends ToolBase {
     const { clientX, clientY } = event
     const mouseClipPos = this.editor.scene.clientToCoord(clientX, clientY)
     const obj = this.editor.baseLayer.isPointInGraph(mouseClipPos)
-    console.log('obj', obj)
+    this.boxHelper.clear()
+    if (obj) {
+      this.boxHelper.add(obj)
+    }
+    this.editor.dynamicLayer.render()
 
     // if (obj)
   }
