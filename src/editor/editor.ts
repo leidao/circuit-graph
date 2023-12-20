@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-01 17:17:18
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-20 16:46:50
+ * @LastEditTime: 2023-12-20 22:05:40
  */
 
 import _ from 'lodash'
@@ -84,6 +84,7 @@ export class Editor {
     this.orbitControler.minZoom = 0.1
     this.orbitControler.addEventListener('change', () => {
       this.scene.render()
+      console.log('====zoom===', this.scene.camera.zoom)
     })
     this.scene.render()
     // tool管理
@@ -213,6 +214,102 @@ export class Editor {
     this.cursorManager.setCursor('default')
     this.scene.render()
   }
+  /** 全选 */
+  selectAll = () => {
+    const selectHelper = this.dynamicLayer.getObjectByName(
+      'selectHelper'
+    ) as SelectHelper
+    if (!selectHelper) return
+    for (const obj of this.baseLayer.children) {
+      selectHelper.add(obj)
+    }
+    this.scene.render()
+  }
+  /** 显示全部/适应画布 */
+  showAll() {
+    const {
+      boundingBox: { min, max },
+      center
+    } = this.baseLayer
+    if (center.isEmpty()) return
+
+    const { viewportWidth, viewportHeight } = this.scene.getViewPort()
+    this.scene.camera.zoom = 1
+    this.orbitControler.setZoom()
+
+    // 算出图层的中心和画布的中心的距离差，平移相机
+    const { position } = this.scene.camera
+    const coord = this.scene.canvasToCoord(
+      viewportWidth / 2,
+      viewportHeight / 2
+    )
+
+    const delta = coord.sub(center)
+    position.copy(position.clone().add(delta))
+
+    // 算出图层的宽度和高度和画布的宽度和高度，取最大值计算比例，缩放相机
+    const vert = this.scene
+      .coordToCanvas(max)
+      .sub(this.scene.coordToCanvas(min))
+    const layerMax = Math.max(vert.x, vert.y)
+    // 适当的缩小画布大小，让缩放值更小点，可以看到更多的图形，而不是正好充满屏幕
+    // 图层的宽度和高度取最大值，画布则取和图层队友的宽度或者高度
+    // 这里用像素的大小去计算比例
+    const canvasMax =
+      layerMax === vert.x ? viewportWidth - 60 : viewportHeight - 60
+    const scale = canvasMax / layerMax
+
+    const zoom = Math.min(9, scale)
+
+    this.scene.camera.zoom = zoom
+    this.orbitControler.setZoom()
+
+    this.scene.render()
+  }
+  /** 显示选中图形/适应选中图形大小 */
+  showSelectGraph() {
+    const selectHelper = this.dynamicLayer.getObjectByName(
+      'selectHelper'
+    ) as SelectHelper
+    if (!selectHelper) return
+    const {
+      boundingBox: { min, max },
+      center
+    } = selectHelper
+    if (center.isEmpty()) return
+    const { viewportWidth, viewportHeight } = this.scene.getViewPort()
+    this.scene.camera.zoom = 1
+    this.orbitControler.setZoom()
+
+    // 算出图层的中心和画布的中心的距离差，平移相机
+    const { position } = this.scene.camera
+    const coord = this.scene.canvasToCoord(
+      viewportWidth / 2,
+      viewportHeight / 2
+    )
+
+    const delta = coord.sub(center)
+    position.copy(position.clone().add(delta))
+
+    // 算出图层的宽度和高度和画布的宽度和高度，取最大值计算比例，缩放相机
+    const vert = this.scene
+      .coordToCanvas(max)
+      .sub(this.scene.coordToCanvas(min))
+    const layerMax = Math.max(vert.x, vert.y)
+    // 适当的缩小画布大小，让缩放值更小点，可以看到更多的图形，而不是正好充满屏幕
+    // 图层的宽度和高度取最大值，画布则取和图层队友的宽度或者高度
+    // 这里用像素的大小去计算比例
+    const canvasMax =
+      layerMax === vert.x ? viewportWidth - 60 : viewportHeight - 60
+    const scale = canvasMax / layerMax
+
+    const zoom = Math.min(9, scale)
+
+    this.scene.camera.zoom = zoom
+    this.orbitControler.setZoom()
+
+    this.scene.render()
+  }
   /** 激活快捷键 */
   activeKeyboard() {
     // 删除
@@ -233,6 +330,24 @@ export class Editor {
       keyboard: ['ctrl+-'],
       execute: this.zoomOut
     })
+    // 全选
+    this.keybordManager.registry({
+      name: 'selectAll',
+      keyboard: ['ctrl+a'],
+      execute: this.selectAll
+    })
+    // 适应画布
+    this.keybordManager.registry({
+      name: 'showAll',
+      keyboard: ['ctrl+1'],
+      execute: this.showAll
+    })
+    // 适应选中图形
+    this.keybordManager.registry({
+      name: 'showSelectGraph',
+      keyboard: ['ctrl+2'],
+      execute: this.showSelectGraph
+    })
   }
 
   /** 失活快捷键 */
@@ -240,6 +355,9 @@ export class Editor {
     this.keybordManager.unRegister('delete')
     this.keybordManager.unRegister('zoomIn')
     this.keybordManager.unRegister('zoomOut')
+    this.keybordManager.unRegister('selectAll')
+    this.keybordManager.unRegister('showAll')
+    this.keybordManager.unRegister('showSelectGraph')
   }
 
   listen() {

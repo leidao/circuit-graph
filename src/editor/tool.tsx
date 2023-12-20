@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2022-04-06 19:34:55
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-20 17:30:19
+ * @LastEditTime: 2023-12-20 22:07:23
  */
 import { Dropdown, InputNumber, MenuProps, Space, Tooltip } from 'antd'
 import { useEffect, useState } from 'react'
@@ -64,6 +64,7 @@ const Tool: React.FC<Props> = ({ className, editor }) => {
           defaultValue={100}
           min={0}
           max={100}
+          className="w-120px"
           formatter={(value) => `${value}%`}
           onChange={zoomChange}
         />
@@ -89,6 +90,26 @@ const Tool: React.FC<Props> = ({ className, editor }) => {
       ),
       key: '3',
       onClick: () => editor?.zoomOut()
+    },
+    {
+      label: (
+        <div className="flex justify-between items-center text-12px">
+          <span>显示全部</span>
+          <span>⌘1</span>
+        </div>
+      ),
+      key: '4',
+      onClick: () => editor?.showAll()
+    },
+    {
+      label: (
+        <div className="w-120px flex justify-between items-center text-12px">
+          <span>显示选中内容</span>
+          <span>⌘2</span>
+        </div>
+      ),
+      key: '5',
+      onClick: () => editor?.showSelectGraph()
     }
   ]
   const styleFn = (value: string) => {

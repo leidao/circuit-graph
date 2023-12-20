@@ -37,6 +37,7 @@ export class Layer extends Group {
     const height = sceneParam.container.clientHeight
     this.setViewPort(width, height)
   }
+
   /* 设置属性 */
   setOption(attr: Object2DType) {
     Object.assign(this, attr)
