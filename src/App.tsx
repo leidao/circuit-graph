@@ -18,9 +18,9 @@ import RouteList from './router'
 
 const App = () => {
   // 根据不同环境使用env内容
-  const VITE_ACCESS_KEY_ID = import.meta.env.VITE_ACCESS_KEY_ID
+  // const VITE_ACCESS_KEY_ID = import.meta.env.VITE_ACCESS_KEY_ID
 
-  console.log(VITE_ACCESS_KEY_ID, 'VITE_ACCESS_KEY_ID')
+  // console.log(VITE_ACCESS_KEY_ID, 'VITE_ACCESS_KEY_ID')
 
   return (
     <ConfigProvider locale={zhCN}>

@@ -3,13 +3,13 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 17:26:26
+ * @LastEditTime: 2023-12-20 10:46:00
  */
 import { Vector2 } from '../math/vector2'
 import { BasicStyle } from '../style/basicStyle'
 import { StandStyle, StandStyleType } from '../style/standStyle'
 import { Object2D, Object2DType } from './object2D'
-import { crtPath } from './objectUtils'
+import { calculateDistanceToLine, crtPath } from './objectUtils'
 
 type LineType = Object2DType & {
   style?: StandStyleType
@@ -131,10 +131,10 @@ export class Line extends Object2D {
         const p1 = new Vector2(points[i][0], points[i][1])
         const p2 = new Vector2(points[i + 1][0], points[i + 1][1])
         // 这里转成像素来判断，鼠标范围更精确
-        const distance = this.calculateDistanceToLine(
-          scene?.coordToCanvas(point),
-          scene?.coordToCanvas(p1),
-          scene?.coordToCanvas(p2)
+        const distance = calculateDistanceToLine(
+          scene.coordToCanvas(point),
+          scene.coordToCanvas(p1),
+          scene.coordToCanvas(p2)
         )
         if (Math.abs(distance) <= pickingBuffer) {
           return this
@@ -142,51 +142,5 @@ export class Line extends Object2D {
       }
     }
     return false
-  }
-
-  /**
-   * 计算点到直线的距离。
-   * @param point 点的坐标。
-   * @param p1 直线上的第一个点的坐标。
-   * @param p2 直线上的第二个点的坐标。
-   * @returns 点到直线的距离。
-   */
-  private calculateDistanceToLine(
-    point: Vector2,
-    p1: Vector2,
-    p2: Vector2
-  ): number {
-    const { x: x1, y: y1 } = p1
-    const { x: x2, y: y2 } = p2
-    const { x: x, y: y } = point
-
-    const A = x - x1
-    const B = y - y1
-    const C = x2 - x1
-    const D = y2 - y1
-
-    const dot = A * C + B * D
-    const lenSq = C * C + D * D
-    let param = -1
-    if (lenSq !== 0) {
-      param = dot / lenSq
-    }
-
-    let xx, yy
-
-    if (param < 0) {
-      xx = x1
-      yy = y1
-    } else if (param > 1) {
-      xx = x2
-      yy = y2
-    } else {
-      xx = x1 + param * C
-      yy = y1 + param * D
-    }
-
-    const dx = x - xx
-    const dy = y - yy
-    return Math.sqrt(dx * dx + dy * dy)
   }
 }

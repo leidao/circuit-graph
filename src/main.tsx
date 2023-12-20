@@ -3,12 +3,11 @@
  * @Author: ldx
  * @Date: 2022-04-25 10:53:57
  * @LastEditors: ldx
- * @LastEditTime: 2022-04-25 11:07:00
+ * @LastEditTime: 2023-12-20 17:13:13
  */
 import './index.css'
 import '@/css/reset.css'
 import '@/css/common.less'
-import 'antd/dist/antd.css'
 import 'uno.css'
 
 import ReactDOM from 'react-dom'

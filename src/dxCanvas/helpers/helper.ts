@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-19 15:39:29
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 16:17:50
+ * @LastEditTime: 2023-12-20 15:49:33
  */
 import { Group } from '../objects/group'
 import { Object2D, Object2DType } from '../objects/object2D'
@@ -47,6 +47,9 @@ class Helper extends Group {
   add(...objs: Object2D[]) {
     for (const obj of objs) {
       if (obj === this) {
+        return this
+      }
+      if (this.children.indexOf(obj) > -1) {
         return this
       }
       this.children.push(obj)

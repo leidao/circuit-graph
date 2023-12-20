@@ -19,6 +19,7 @@ class ToolDragCanvas extends ToolBase {
   }
   /** 鼠标按下 */
   pointerdown(event: PointerEvent) {
+    this.editor.cursorManager.setCursor('grabbing')
     this.editor.orbitControler.pointerdown(event)
   }
   /** 鼠标移动 */
@@ -27,6 +28,7 @@ class ToolDragCanvas extends ToolBase {
   }
   /** 鼠标松开 */
   pointerup() {
+    this.editor.cursorManager.setCursor('grab')
     this.editor.orbitControler.pointerup()
   }
   active() {

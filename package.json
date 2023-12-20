@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "ahooks": "^3.3.0",
-    "antd": "4.24.15",
+    "antd": "^5.12.4",
     "gcoord": "^1.0.5",
     "history": "^5.3.0",
     "less-plugin-import-node-modules": "^1.0.0",
@@ -35,7 +35,6 @@
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
     "@icon-park/react": "^1.3.5",
-    "@types/antd": "^1.0.0",
     "@types/axios": "^0.14.0",
     "@types/classnames": "^2.3.1",
     "@types/lodash": "^4.14.178",

@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 09:38:54
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 14:31:06
+ * @LastEditTime: 2023-12-20 11:33:36
  */
 /*
  * @Description:
@@ -15,8 +15,8 @@
 
 import { EventDispatcher } from '@/dxCanvas/core/eventDispatcher'
 
+import cursorDefault from '../cursor/cursor-icons/editor-cursor-default.png'
 import { Editor } from '../editor'
-import cursorDefault from './cursor-images/suika-cursor-default.png'
 import ToolBase from './toolBase'
 import ToolDragCanvas from './toolDragCanvas'
 import ToolDrawLine from './toolDrawLine'
@@ -107,13 +107,13 @@ class ToolManager extends EventDispatcher {
     if (!this.activeTool) return
     switch (this.activeTool.type) {
       case 'selectGraph':
-        this.editor.domElement.style.cursor = `url(${cursorDefault}) 5 5,auto`
+        this.editor.cursorManager.setCursor('default')
         break
       case 'dragCanvas':
-        this.editor.domElement.style.cursor = 'grab'
+        this.editor.cursorManager.setCursor('grab')
         break
       default:
-        this.editor.domElement.style.cursor = 'crosshair'
+        this.editor.cursorManager.setCursor('crosshair')
         break
     }
   }

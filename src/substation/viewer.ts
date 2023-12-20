@@ -126,12 +126,12 @@ export class Viewer {
   pointermove = _.throttle((event: PointerEvent) => {
     this.orbitControler.pointermove(event)
     const { clientX, clientY } = event
-    const mouseClipPos = this.scene.clientToCoord(clientX, clientY)
+    const mouseCoordPos = this.scene.clientToCoord(clientX, clientY)
     let isExists = null
     this.shapeGroup.children.forEach((shape) => {
       const flag = this.scene.isPointInObj(
         shape,
-        mouseClipPos,
+        mouseCoordPos,
         shape.pvmoMatrix
       )
       if (flag) {

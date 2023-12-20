@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-19 15:39:29
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 18:08:42
+ * @LastEditTime: 2023-12-20 16:22:40
  */
 import { crtPath } from '../objects/objectUtils'
 import Helper, { HelperType } from './helper'
@@ -11,6 +11,7 @@ import Helper, { HelperType } from './helper'
 class BoxHelper extends Helper {
   // 类型
   readonly isBoxHelper = true
+  name = 'boxHelper'
   constructor(attr: HelperType = {}) {
     super(attr)
   }
@@ -21,7 +22,7 @@ class BoxHelper extends Helper {
     //样式
     style.apply(ctx)
     // 1 / 2 / zoom = n   1 = n * zoom * 2
-    ctx.lineWidth = 2 / zoom
+    ctx.lineWidth = 1 / zoom
     for (const obj of children) {
       if (!obj.visible) continue
       const {

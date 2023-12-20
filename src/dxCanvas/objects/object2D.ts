@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 17:25:21
+ * @LastEditTime: 2023-12-20 12:27:11
  */
 import { EventDispatcher } from '../core/eventDispatcher'
 import { Scene } from '../core/scene'
@@ -62,7 +62,14 @@ export abstract class Object2D extends EventDispatcher {
   }
   /** 类型 */
   readonly isObject2D = true
+  /** 中点 */
 
+  get center() {
+    const {
+      boundingBox: { min, max }
+    } = this
+    return max.clone().add(min).multiplyScalar(0.5)
+  }
   /* 本地模型矩阵 */
   get matrix(): Matrix3 {
     const { position, rotate, scale } = this

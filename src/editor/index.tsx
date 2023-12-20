@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2022-04-06 19:34:55
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-17 12:55:12
+ * @LastEditTime: 2023-12-20 17:22:21
  */
 import { useEffect, useRef, useState } from 'react'
 
@@ -122,13 +122,13 @@ const Home = () => {
       </div>
       <div className="flex-1 relative box-border h-100%">
         <Tool
-          className="h-40px border-b-1px border-#dadadc99 text-##202020"
+          className="h-38px border-b-1px border-#dadadc99 text-##202020"
           editor={editor}
         ></Tool>
         <div
           className="absolute left-0px top-40px box-border w-100% bg-#f4f4f4"
           style={{
-            height: 'calc(100% - 40px)'
+            height: 'calc(100% - 38px)'
           }}
           ref={container}
         >

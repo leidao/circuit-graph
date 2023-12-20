@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-19 16:05:57
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-18 10:24:39
+ * @LastEditTime: 2023-12-20 10:31:21
  */
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
@@ -68,4 +68,50 @@ export const nearestPixelVal = (n: number) => {
   const left = Math.floor(n)
   const right = Math.ceil(n)
   return (n - left < right - n ? left : right) + 0.5
+}
+
+/**
+ * 计算点到直线的距离。
+ * @param point 点的坐标。
+ * @param p1 直线上的第一个点的坐标。
+ * @param p2 直线上的第二个点的坐标。
+ * @returns 点到直线的距离。
+ */
+export const calculateDistanceToLine = (
+  point: Vector2,
+  p1: Vector2,
+  p2: Vector2
+): number => {
+  const { x: x1, y: y1 } = p1
+  const { x: x2, y: y2 } = p2
+  const { x: x, y: y } = point
+
+  const A = x - x1
+  const B = y - y1
+  const C = x2 - x1
+  const D = y2 - y1
+
+  const dot = A * C + B * D
+  const lenSq = C * C + D * D
+  let param = -1
+  if (lenSq !== 0) {
+    param = dot / lenSq
+  }
+
+  let xx, yy
+
+  if (param < 0) {
+    xx = x1
+    yy = y1
+  } else if (param > 1) {
+    xx = x2
+    yy = y2
+  } else {
+    xx = x1 + param * C
+    yy = y1 + param * D
+  }
+
+  const dx = x - xx
+  const dy = y - yy
+  return Math.sqrt(dx * dx + dy * dy)
 }

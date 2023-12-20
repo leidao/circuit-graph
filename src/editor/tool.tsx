@@ -3,9 +3,9 @@
  * @Author: ldx
  * @Date: 2022-04-06 19:34:55
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 15:24:15
+ * @LastEditTime: 2023-12-20 17:30:19
  */
-import { Dropdown, InputNumber, Space } from 'antd'
+import { Dropdown, InputNumber, MenuProps, Space, Tooltip } from 'antd'
 import { useEffect, useState } from 'react'
 
 import { Editor } from './editor'
@@ -30,13 +30,33 @@ const Tool: React.FC<Props> = ({ className, editor }) => {
       setActive('selectGraph')
     }
     editor.toolManager.addEventListener('finish', fn)
+    editor.keybordManager.registry({
+      name: 'select',
+      keyboard: ['a'],
+      execute: () => setActive('selectGraph')
+    })
+    editor.keybordManager.registry({
+      name: 'text',
+      keyboard: ['t'],
+      execute: () => setActive('drawText')
+    })
+    editor.keybordManager.registry({
+      name: 'drag',
+      keyboard: ['h'],
+      execute: () => setActive('dragCanvas')
+    })
+    editor.keybordManager.registry({
+      name: 'line',
+      keyboard: ['l'],
+      execute: () => setActive('drawLine')
+    })
     return () => {
       editor.toolManager.removeEventListener('finish', fn)
     }
   }, [editor])
   /** 改变画布缩放大小 */
   const zoomChange = () => {}
-  const items: any = [
+  const items: MenuProps['items'] = [
     {
       label: (
         <InputNumber
@@ -51,11 +71,25 @@ const Tool: React.FC<Props> = ({ className, editor }) => {
       key: '1'
     },
     {
-      label: '放大',
+      label: (
+        <div className="flex justify-between items-center text-12px">
+          <span>放大</span>
+          <span>⌘+</span>
+        </div>
+      ),
       key: '2',
       onClick: () => editor?.zoomIn()
     },
-    { label: '缩小', key: '3', onClick: () => editor?.zoomOut }
+    {
+      label: (
+        <div className="flex justify-between items-center text-12px">
+          <span>缩小</span>
+          <span>⌘-</span>
+        </div>
+      ),
+      key: '3',
+      onClick: () => editor?.zoomOut()
+    }
   ]
   const styleFn = (value: string) => {
     return {
@@ -69,38 +103,56 @@ const Tool: React.FC<Props> = ({ className, editor }) => {
     editor.toolManager.setActiveTool(toolName)
   }
   return (
-    <div className={`${className} flex justify-center items-center`}>
+    <div
+      className={`${className} flex justify-center items-center border-b-1px border-#dadadc99`}
+    >
       <div className="flex-1 flex items-center ">
         <div
           className="cursor-pointer w-32px h-32px hover:bg-#f2f2f2  rounded-6px flex justify-center items-center ml-10px"
           style={styleFn('selectGraph')}
           onClick={() => setActive('selectGraph')}
         >
-          <SelectOutlined></SelectOutlined>
+          <Tooltip placement="bottom" title="选择 A" arrow={false}>
+            <span className="flex justify-center items-center">
+              <SelectOutlined></SelectOutlined>
+            </span>
+          </Tooltip>
         </div>
         <div
           className="cursor-pointer w-32px h-32px hover:bg-#f2f2f2  rounded-6px flex justify-center items-center ml-10px"
           style={styleFn('drawText')}
           onClick={() => setActive('drawText')}
         >
-          <TextFilled></TextFilled>
+          <Tooltip placement="bottom" title="绘制文字 T" arrow={false}>
+            <span className="flex justify-center items-center">
+              <TextFilled></TextFilled>
+            </span>
+          </Tooltip>
         </div>
         <div
           className="cursor-pointer w-32px h-32px hover:bg-#f2f2f2  rounded-6px flex justify-center items-center ml-10px"
           style={styleFn('dragCanvas')}
           onClick={() => setActive('dragCanvas')}
         >
-          <HandOutlined></HandOutlined>
+          <Tooltip placement="bottom" title="拖拽画布 H" arrow={false}>
+            <span className="flex justify-center items-center">
+              <HandOutlined></HandOutlined>
+            </span>
+          </Tooltip>
         </div>
         <div
           className="cursor-pointer w-32px h-32px hover:bg-#f2f2f2  rounded-6px flex justify-center items-center ml-10px"
           style={styleFn('drawLine')}
           onClick={() => setActive('drawLine')}
         >
-          <LineOutlined></LineOutlined>
+          <Tooltip placement="bottom" title="绘制线段 L" arrow={false}>
+            <span className="flex justify-center items-center">
+              <LineOutlined></LineOutlined>
+            </span>
+          </Tooltip>
         </div>
       </div>
-      <div className="w-100px">
+      <div className="w-76px">
         <Dropdown
           menu={{ items }}
           trigger={['click']}
@@ -108,13 +160,12 @@ const Tool: React.FC<Props> = ({ className, editor }) => {
           onOpenChange={(flag) => {
             setOpen(flag)
           }}
+          placement="bottom"
         >
-          <a onClick={(e) => e.preventDefault()}>
-            <Space>
-              <div>100%</div>
-              <DownOutlined className="mt-6px fill-#1890ff " />
-            </Space>
-          </a>
+          <Space className="cursor-pointer">
+            <div className="text-#1890ff">100%</div>
+            <DownOutlined className="mt-6px fill-#1890ff " />
+          </Space>
         </Dropdown>
       </div>
     </div>

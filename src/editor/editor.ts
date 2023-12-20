@@ -3,16 +3,24 @@
  * @Author: ldx
  * @Date: 2023-12-01 17:17:18
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 14:09:01
+ * @LastEditTime: 2023-12-20 16:46:50
  */
 
 import _ from 'lodash'
 
-import { Img, OrbitControler, Scene, Vector2 } from '@/dxCanvas'
+import {
+  HoverHelper,
+  Img,
+  OrbitControler,
+  Scene,
+  SelectHelper,
+  Vector2
+} from '@/dxCanvas'
 import { Layer } from '@/dxCanvas/objects/layer'
 import { Ruler } from '@/dxCanvas/objects/ruler'
 
 import KeybordManager from './command/keybordManger'
+import CursorManager from './cursor/cursorManager'
 import ToolManager from './tools/toolManager'
 
 type Option = {
@@ -34,8 +42,8 @@ export class Editor {
   isMousedown = false
   /** canvas元素 */
   domElement!: HTMLDivElement
-  /* 鼠标的裁剪坐标位 */
-  mouseClipPos = new Vector2(Infinity)
+  /* 鼠标的相机坐标位 */
+  mouseCoordPos = new Vector2(Infinity)
   /** 当前工具栏 */
   toolOperation = 'panning'
   /** 鼠标是否按下 */
@@ -46,6 +54,8 @@ export class Editor {
   toolManager!: ToolManager
   /** 快捷键管理器 */
   keybordManager!: KeybordManager
+  /** 鼠标样式管理器 */
+  cursorManager!: CursorManager
   constructor(option: Option) {
     if (!option.container) return
     // 场景相关
@@ -78,7 +88,13 @@ export class Editor {
     this.scene.render()
     // tool管理
     this.toolManager = new ToolManager(this)
+    // 快捷键管理
     this.keybordManager = new KeybordManager(this)
+    // 鼠标样式管理
+    this.cursorManager = new CursorManager(this)
+
+    // 快捷键注册
+    this.activeKeyboard()
   }
 
   /** 缩放 */
@@ -107,9 +123,9 @@ export class Editor {
   /** 鼠标移动 */
   pointermove = _.throttle((event: PointerEvent) => {
     const { clientX, clientY } = event
-    const mouseClipPos = this.scene.clientToCoord(clientX, clientY)
+    const mouseCoordPos = this.scene.clientToCoord(clientX, clientY)
     this.toolManager.pointermove(event)
-    const obj = this.dynamicLayer.isPointInGraph(mouseClipPos)
+    const obj = this.dynamicLayer.isPointInGraph(mouseCoordPos)
     // console.log('obj', obj)
   }, 10)
   /** 鼠标松开 */
@@ -154,6 +170,11 @@ export class Editor {
       offset: new Vector2(70, 50).multiplyScalar(-0.5)
     })
     this.baseLayer.add(pattern)
+    const selectHelper = this.dynamicLayer.getObjectByName(
+      'selectHelper'
+    ) as SelectHelper
+    selectHelper.clear()
+    selectHelper.add(pattern)
     this.scene.render()
   }
   /**  放大 */
@@ -163,7 +184,6 @@ export class Editor {
     if (scene.camera.zoom > orbitControler.maxZoom) return
     scene.camera.zoom /= scale
     this.orbitControler.setZoom()
-
     this.scene.render()
   }
 
@@ -175,6 +195,51 @@ export class Editor {
     scene.camera.zoom *= scale
     this.orbitControler.setZoom()
     this.scene.render()
+  }
+  /** 删除选中的图形 */
+  delete = () => {
+    const selectHelper = this.dynamicLayer.getObjectByName(
+      'selectHelper'
+    ) as SelectHelper
+    const hoverHelper = this.dynamicLayer.getObjectByName(
+      'hoverHelper'
+    ) as HoverHelper
+    if (!selectHelper) return
+    for (const obj of selectHelper.children) {
+      hoverHelper.remove(obj)
+      obj.remove()
+    }
+    selectHelper.clear()
+    this.cursorManager.setCursor('default')
+    this.scene.render()
+  }
+  /** 激活快捷键 */
+  activeKeyboard() {
+    // 删除
+    this.keybordManager.registry({
+      name: 'delete',
+      keyboard: ['backspace'],
+      execute: this.delete
+    })
+    // 放大
+    this.keybordManager.registry({
+      name: 'zoomIn',
+      keyboard: ['ctrl+='],
+      execute: this.zoomIn
+    })
+    // 缩小
+    this.keybordManager.registry({
+      name: 'zoomOut',
+      keyboard: ['ctrl+-'],
+      execute: this.zoomOut
+    })
+  }
+
+  /** 失活快捷键 */
+  inactiveKeyboard() {
+    this.keybordManager.unRegister('delete')
+    this.keybordManager.unRegister('zoomIn')
+    this.keybordManager.unRegister('zoomOut')
   }
 
   listen() {

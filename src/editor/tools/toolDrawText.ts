@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-20 09:14:12
+ * @LastEditTime: 2023-12-20 11:34:51
  */
 import { Animation, Line, Text2D, Vector2 } from '@/dxCanvas'
 import { alignRatio, baselineRatio } from '@/dxCanvas/objects/text2D'
@@ -98,10 +98,10 @@ class ToolDrawText extends ToolBase {
     const moveCoord = editor.scene.clientToCoord(clientX, clientY)
     const flag = this.text?.isPointInGraph(moveCoord)
     if (flag) {
-      this.editor.domElement.style.cursor = 'text'
+      this.editor.cursorManager.setCursor('text')
       this.input.style.cursor = 'text'
     } else {
-      this.editor.domElement.style.cursor = 'crosshair'
+      this.editor.cursorManager.setCursor('crosshair')
       this.input.style.cursor = 'crosshair'
     }
   }

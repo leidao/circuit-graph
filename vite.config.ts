@@ -3,13 +3,13 @@
  * @Author: ldx
  * @Date: 2022-04-06 14:45:22
  * @LastEditors: ldx
- * @LastEditTime: 2022-04-15 12:59:48
+ * @LastEditTime: 2023-12-20 17:15:30
  */
 import legacy from '@vitejs/plugin-legacy'
 import react from '@vitejs/plugin-react'
-import * as fs from 'fs'
+// import * as fs from 'fs'
 import LessPluginImportNodeModules from 'less-plugin-import-node-modules'
-import lessToJS from 'less-vars-to-js'
+// import lessToJS from 'less-vars-to-js'
 import { resolve } from 'path'
 import { presetUno } from 'unocss'
 import Unocss from 'unocss/vite'
@@ -17,9 +17,9 @@ import { defineConfig } from 'vite'
 // import autoCSSModulePlugin from 'vite-plugin-auto-css-modules'
 // import { AntdResolve, createStyleImportPlugin } from 'vite-plugin-style-import'
 
-const themeVariables = lessToJS(
-  fs.readFileSync(resolve(__dirname, './src/css/variables.less'), 'utf8')
-)
+// const themeVariables = lessToJS(
+//   fs.readFileSync(resolve(__dirname, './src/css/variables.less'), 'utf8')
+// )
 // const safelist = []
 // for (let i = 0; i < 800; i++) {
 //   safelist.push(`h-${i}px`)
@@ -63,9 +63,9 @@ export default defineConfig({
         javascriptEnabled: true,
         module: true,
         // 解析第三方包的less样式
-        plugins: [new LessPluginImportNodeModules()],
+        plugins: [new LessPluginImportNodeModules()]
         // 重写 less 变量，定制样式
-        modifyVars: themeVariables
+        // modifyVars: themeVariables
       }
     }
   },
