@@ -1,5 +1,6 @@
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
+import { BasicStyle } from '../style/basicStyle'
 import { TextStyle, TextStyleType } from '../style/textStyle'
 import { Object2D, Object2DType } from './object2D'
 import { crtPathByMatrix } from './objectUtils'
@@ -18,14 +19,14 @@ const virtuallyCtx = document
   .getContext('2d') as CanvasRenderingContext2D
 
 /* 文字对齐方式引起的偏移量 */
-const alignRatio = {
+export const alignRatio = {
   start: 0,
   left: 0,
   center: -0.5,
   end: -1,
   right: -1
 }
-const baselineRatio = {
+export const baselineRatio = {
   top: 0,
   middle: -0.5,
   bottom: -1,
@@ -40,7 +41,6 @@ class Text2D extends Object2D {
   style: TextStyle = new TextStyle()
   offset = new Vector2(0, 0)
   pickingBuffer = 4
-
   // 类型
   readonly isText = true
 
@@ -96,7 +96,7 @@ class Text2D extends Object2D {
   }
 
   /* 绘图 */
-  drawShape(ctx: CanvasRenderingContext2D) {
+  drawShape(ctx: CanvasRenderingContext2D, externalStyle?: BasicStyle) {
     const {
       text,
       offset: { x, y },
@@ -106,6 +106,7 @@ class Text2D extends Object2D {
 
     //样式
     style.apply(ctx)
+    externalStyle && externalStyle.apply(ctx)
     // 绘图
     for (const method of style.drawOrder) {
       style[`${method}Style`] && ctx[`${method}Text`](text, x, y, maxWidth)
@@ -122,26 +123,27 @@ class Text2D extends Object2D {
       pickingBuffer
     } = this
 
-    const a = new Vector2(
+    const vertMin = new Vector2(
       offset.x + size.x * alignRatio[textAlign],
       offset.y + size.y * baselineRatio[textBaseline]
     )
-    const b = new Vector2().addVectors(a, size)
-    min.copy(a.applyMatrix3(this.worldMatrix))
-    max.copy(b.applyMatrix3(this.worldMatrix))
+    const vertMax = new Vector2().addVectors(vertMin, size)
+    min.copy(vertMin.applyMatrix3(this.worldMatrix))
+    max.copy(vertMax.applyMatrix3(this.worldMatrix))
 
     const scene = this.getScene()
     if (!scene) return
+    const zoom = scene.camera.zoom
     const minPixel = scene.coordToCanvas(min)
     const minCoord = scene.canvasToCoord(
-      minPixel.x - pickingBuffer,
-      minPixel.y - pickingBuffer
+      minPixel.x - pickingBuffer * zoom,
+      minPixel.y - pickingBuffer * zoom
     )
     min.copy(minCoord)
     const maxPixel = scene.coordToCanvas(max)
     const maxCoord = scene.canvasToCoord(
-      maxPixel.x + pickingBuffer,
-      maxPixel.y + pickingBuffer
+      maxPixel.x + pickingBuffer * zoom,
+      maxPixel.y + pickingBuffer * zoom
     )
     max.copy(maxCoord)
   }

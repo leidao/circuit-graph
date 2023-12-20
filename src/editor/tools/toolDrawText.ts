@@ -3,9 +3,10 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 15:17:54
+ * @LastEditTime: 2023-12-20 09:14:12
  */
 import { Animation, Line, Text2D, Vector2 } from '@/dxCanvas'
+import { alignRatio, baselineRatio } from '@/dxCanvas/objects/text2D'
 
 import { Editor } from '../editor'
 import ToolBase from './toolBase'
@@ -45,9 +46,20 @@ class ToolDrawText extends ToolBase {
       this.text.text = value
       this.text.computeBoundingBox()
       const {
-        boundingBox: { max }
+        offset,
+        size,
+        style: { textAlign, textBaseline }
       } = this.text
-      this.cursor.position.set(max.x, this.downPointCoord.y)
+
+      const vertMin = new Vector2(
+        offset.x + size.x * alignRatio[textAlign],
+        offset.y + size.y * baselineRatio[textBaseline]
+      )
+      const vertMax = new Vector2()
+        .addVectors(vertMin, size)
+        .applyMatrix3(this.text.worldMatrix)
+
+      this.cursor.position.set(vertMax.x, this.downPointCoord.y)
       this.editor.scene.render()
     }
   }

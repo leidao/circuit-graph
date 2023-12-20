@@ -3,13 +3,14 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 15:51:03
+ * @LastEditTime: 2023-12-19 17:25:21
  */
 import { EventDispatcher } from '../core/eventDispatcher'
 import { Scene } from '../core/scene'
 import { generateUUID } from '../math/mathUtils.js'
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
+import { BasicStyle } from '../style/basicStyle'
 import { Group } from './group'
 import { Layer } from './layer'
 import { crtPath } from './objectUtils'
@@ -165,7 +166,7 @@ export abstract class Object2D extends EventDispatcher {
   }
 
   /* 绘图 */
-  draw(ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D, externalStyle?: BasicStyle) {
     if (!this.visible) {
       return
     }
@@ -178,7 +179,7 @@ export abstract class Object2D extends EventDispatcher {
     /*  矩阵变换 */
     this.transform(ctx)
     /* 绘制图形 */
-    this.drawShape(ctx)
+    this.drawShape(ctx, externalStyle)
 
     ctx.restore()
   }
@@ -221,7 +222,10 @@ export abstract class Object2D extends EventDispatcher {
   }
 
   /* 绘制图形-接口 */
-  abstract drawShape(ctx: CanvasRenderingContext2D): void
+  abstract drawShape(
+    ctx: CanvasRenderingContext2D,
+    externalStyle?: BasicStyle
+  ): void
   /** 获取包围盒 */
   abstract computeBoundingBox(): void
   /** 点位是否在图形中 */
