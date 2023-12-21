@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 17:12:50
+ * @LastEditTime: 2023-12-21 20:25:30
  */
 import { Vector2 } from '../math/vector2'
 import { BasicStyle } from '../style/basicStyle'
@@ -128,16 +128,22 @@ export class Line extends Object2D {
       const { points, pickingBuffer } = this
       const scene = this.getScene()
       if (!scene) return false
+      const len = this.style.lineWidth * scene.camera.zoom
+
       for (let i = 0; i < points.length - 1; i++) {
-        const p1 = new Vector2(points[i][0], points[i][1])
-        const p2 = new Vector2(points[i + 1][0], points[i + 1][1])
+        const p1 = new Vector2(points[i][0], points[i][1]).applyMatrix3(
+          this.worldMatrix
+        )
+        const p2 = new Vector2(points[i + 1][0], points[i + 1][1]).applyMatrix3(
+          this.worldMatrix
+        )
         // 这里转成像素来判断，鼠标范围更精确
         const distance = calculateDistanceToLine(
           scene.coordToCanvas(point),
           scene.coordToCanvas(p1),
           scene.coordToCanvas(p2)
         )
-        if (Math.abs(distance) <= pickingBuffer) {
+        if (Math.abs(distance) <= pickingBuffer + len) {
           return this
         }
       }

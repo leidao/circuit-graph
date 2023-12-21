@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 17:28:18
+ * @LastEditTime: 2023-12-21 20:27:27
  */
 import { dpr } from '../core/camera'
 import { Matrix3 } from '../math/matrix3'
@@ -64,14 +64,11 @@ export class Rect extends Object2D {
   /** 获取包围盒数据 */
   computeBoundingBox() {
     const {
-      x,
-      y,
-      width,
-      height,
+      points,
       boundingBox: { min, max }
     } = this
-    min.set(x, y)
-    max.set(x + width, y + height)
+    min.copy(new Vector2(...points[0]).applyMatrix3(this.worldMatrix))
+    max.copy(new Vector2(...points[1]).applyMatrix3(this.worldMatrix))
   }
   /** 点位是否在图形中 */
   isPointInGraph(point: Vector2): Rect | false {

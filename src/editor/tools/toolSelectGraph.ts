@@ -95,6 +95,8 @@ class ToolSelectGraph extends ToolBase {
       this.editor.baseLayer.render()
     } else {
       // 正常移动操作，鼠标经过图形时的变化，选中图形后鼠标的样式绘制等
+      console.log('this.editor.baseLayer', this.editor.baseLayer)
+
       const obj = this.editor.baseLayer.isPointInGraph(mouseCoordPos)
       this.hoverHelper.clear()
       if (obj) {
