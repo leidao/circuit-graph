@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-01 17:17:18
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-20 22:05:40
+ * @LastEditTime: 2023-12-21 09:37:27
  */
 
 import _ from 'lodash'
@@ -226,7 +226,7 @@ export class Editor {
     this.scene.render()
   }
   /** 显示全部/适应画布 */
-  showAll() {
+  showAll = () => {
     const {
       boundingBox: { min, max },
       center
@@ -267,7 +267,7 @@ export class Editor {
     this.scene.render()
   }
   /** 显示选中图形/适应选中图形大小 */
-  showSelectGraph() {
+  showSelectGraph = () => {
     const selectHelper = this.dynamicLayer.getObjectByName(
       'selectHelper'
     ) as SelectHelper

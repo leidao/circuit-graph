@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-20 16:30:07
+ * @LastEditTime: 2023-12-21 09:51:54
  */
 import { HoverHelper, SelectHelper, Vector2 } from '@/dxCanvas'
 import { State } from '@/dxCanvas/helpers/selectHelper'
@@ -23,9 +23,7 @@ class ToolSelectGraph extends ToolBase {
   hoverHelper = new HoverHelper({
     style: { strokeStyle: '#558ef0', fillStyle: '#558ef0' }
   })
-  selectHelper = new SelectHelper({
-    style: { strokeStyle: '#558ef0', fillStyle: '#fff' }
-  })
+  selectHelper = new SelectHelper()
   constructor(editor: Editor, manager: ToolManager) {
     super(editor, manager)
     editor.dynamicLayer.add(this.hoverHelper)
@@ -67,12 +65,25 @@ class ToolSelectGraph extends ToolBase {
     const mouseCoordPos = this.editor.scene.clientToCoord(clientX, clientY)
     if (this.isDown) {
       // 下面是平移、旋转、缩放的操作
-      if (this.cursorState === 'move') {
-        for (const obj of this.selectHelper.children) {
-          const delta = mouseCoordPos.clone().sub(this.mouseCoordPos)
-          obj.position = obj.position.clone().add(delta)
-        }
+      switch (this.cursorState) {
+        case 'move':
+          for (const obj of this.selectHelper.children) {
+            const delta = mouseCoordPos.clone().sub(this.mouseCoordPos)
+            obj.position = obj.position.clone().add(delta)
+          }
+          break
+        case 'scaleY':
+          for (const obj of this.selectHelper.children) {
+            const delta = mouseCoordPos.clone().sub(this.mouseCoordPos)
+
+            // obj.scale.set()
+          }
+          break
+
+        default:
+          break
       }
+
       // 鼠标样式同步更新位置
       this.selectHelper.getMouseState(mouseCoordPos)
       this.mouseCoordPos = mouseCoordPos.clone()

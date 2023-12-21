@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-19 15:39:29
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-20 16:21:16
+ * @LastEditTime: 2023-12-21 09:33:01
  */
 import { Vector2 } from '../math/vector2'
 import { calculateDistanceToLine, crtPath } from '../objects/objectUtils'
@@ -45,13 +45,36 @@ class SelectHelper extends Helper {
   }
   /* 绘图 */
   drawShape(ctx: CanvasRenderingContext2D) {
-    const { style } = this
+    const { style, children } = this
     //样式
     // 1 / 2 / zoom = n   1 = n * zoom * 2
     const zoom = this.getScene()?.camera.zoom || 1
-    ctx.save()
+    style.strokeStyle = '#558ef0'
+    style.fillStyle = '#558ef0'
     style.apply(ctx)
-
+    // hover样式
+    for (const obj of children) {
+      ctx.beginPath()
+      if (obj.isImg) {
+        const {
+          boundingBox: {
+            min: { x: x0, y: y0 },
+            max: { x: x1, y: y1 }
+          }
+        } = obj
+        ctx.lineWidth = 1 / zoom
+        crtPath(ctx, [x0, y0, x1, y0, x1, y1, x0, y1], true)
+        ctx.stroke()
+      } else if (obj.isLineSegments) {
+        style.lineWidth = obj.style.lineWidth + 3
+        obj.draw(ctx, style)
+      } else {
+        obj.draw(ctx, style)
+      }
+    }
+    style.strokeStyle = '#558ef0'
+    style.fillStyle = '#fff'
+    style.apply(ctx)
     // 包围盒
     ctx.beginPath()
     const {
@@ -69,7 +92,6 @@ class SelectHelper extends Helper {
     ctx.beginPath()
     const pointSize = new Vector2(8 / zoom, 8 / zoom)
     const [w, h] = [pointSize.x / 2, pointSize.y / 2]
-
     for (let i = 0; i < this.vertices.length; i += 2) {
       const bx = this.vertices[i]
       const by = this.vertices[i + 1]
@@ -81,6 +103,7 @@ class SelectHelper extends Helper {
     }
     ctx.fill()
     ctx.stroke()
+
     // cursor手势
     if (this.state) {
       ctx.beginPath()
@@ -96,6 +119,7 @@ class SelectHelper extends Helper {
       ctx.stroke()
       ctx.fill()
     }
+
     ctx.restore()
   }
   /* 获取变换状态 */

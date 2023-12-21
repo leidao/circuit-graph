@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-19 15:39:29
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-20 15:49:33
+ * @LastEditTime: 2023-12-21 09:56:10
  */
 import { Group } from '../objects/group'
 import { Object2D, Object2DType } from '../objects/object2D'
@@ -13,7 +13,7 @@ export type HelperType = Object2DType & {
   style?: StandStyleType
 }
 
-class Helper extends Group {
+abstract class Helper extends Group {
   style: StandStyle = new StandStyle()
   // 类型
   readonly isHelper = true

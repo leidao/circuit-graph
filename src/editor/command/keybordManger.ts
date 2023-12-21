@@ -51,10 +51,10 @@ export default class KeybordManager {
   onKeydown = (event: KeyboardEvent) => {
     this.execute(event, this.keydownMap)
   }
-  onKeyup = (event: KeyboardEvent)=>{
+  onKeyup = (event: KeyboardEvent) => {
     this.execute(event, this.keyupMap)
   }
-  execute(event: KeyboardEvent, keyBindingMap: Map<string, CommandMap>){
+  execute(event: KeyboardEvent, keyBindingMap: Map<string, CommandMap>) {
     if (
       event.target instanceof HTMLInputElement ||
       event.target instanceof HTMLTextAreaElement
@@ -84,9 +84,9 @@ export default class KeybordManager {
       }
       const keys = Array.isArray(keyboard) ? keyboard : [keyboard]
       if (keys.indexOf(keyNames) > -1) {
-        execute(this.editor)
         event.stopPropagation()
         event.preventDefault()
+        execute(this.editor)
       }
     })
   }

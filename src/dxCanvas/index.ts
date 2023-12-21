@@ -3,9 +3,8 @@
  * @Author: ldx
  * @Date: 2023-12-02 16:52:41
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 18:07:31
+ * @LastEditTime: 2023-12-21 09:11:52
  */
-export { ImgControler } from './controls/imgControls'
 export { OrbitControler } from './controls/orbitControls'
 export { Animation } from './core/animation'
 export { Camera } from './core/camera'
