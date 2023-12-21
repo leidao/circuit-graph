@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 17:26:15
+ * @LastEditTime: 2023-12-21 17:12:32
  */
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
@@ -33,7 +33,7 @@ export class Img extends Object2D {
   size: Vector2 = new Vector2(300, 150)
   view: View | undefined
   style: BasicStyle = new BasicStyle()
-
+  name = 'Img'
   // 类型
   readonly isImg = true
   constructor(attr: ImgType = {}) {

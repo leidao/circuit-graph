@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 09:51:54
+ * @LastEditTime: 2023-12-21 10:31:51
  */
 import { HoverHelper, SelectHelper, Vector2 } from '@/dxCanvas'
 import { State } from '@/dxCanvas/helpers/selectHelper'
@@ -65,6 +65,8 @@ class ToolSelectGraph extends ToolBase {
     const mouseCoordPos = this.editor.scene.clientToCoord(clientX, clientY)
     if (this.isDown) {
       // 下面是平移、旋转、缩放的操作
+      console.log('this.cursorState', this.cursorState)
+
       switch (this.cursorState) {
         case 'move':
           for (const obj of this.selectHelper.children) {
@@ -72,11 +74,14 @@ class ToolSelectGraph extends ToolBase {
             obj.position = obj.position.clone().add(delta)
           }
           break
-        case 'scaleY':
+        case 'scaleX':
           for (const obj of this.selectHelper.children) {
-            const delta = mouseCoordPos.clone().sub(this.mouseCoordPos)
-
-            // obj.scale.set()
+            const delta = mouseCoordPos.clone().sub(this.downCoordPos)
+            const { min, max } = obj.boundingBox
+            const width = max.x - min.x
+            const num =
+              delta.x > 0 ? delta.x + width : Math.abs(width - delta.x)
+            obj.scale.set(num / width, 1)
           }
           break
 

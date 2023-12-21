@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-20 14:18:47
+ * @LastEditTime: 2023-12-21 16:25:19
  */
 import { Vector2 } from '../math/vector2'
 import { Object2D, Object2DType } from './object2D'
@@ -35,6 +35,7 @@ export class Group extends Object2D {
       this.children.push(obj)
       this.dispatchEvent({ type: 'add', target: obj })
     }
+    this.dispatchEvent({ type: 'change', target: this })
     this.sort()
     return this
   }
@@ -56,6 +57,7 @@ export class Group extends Object2D {
         }
       }
     }
+    this.dispatchEvent({ type: 'change', target: this })
     return this
   }
 
@@ -65,6 +67,7 @@ export class Group extends Object2D {
       obj.parent = undefined
       this.dispatchEvent({ type: 'removed', target: obj })
     }
+    this.dispatchEvent({ type: 'change', target: this })
     this.children = []
     return this
   }

@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-01 17:17:18
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 09:37:27
+ * @LastEditTime: 2023-12-21 17:33:29
  */
 
 import _ from 'lodash'
@@ -80,11 +80,10 @@ export class Editor {
     this.dynamicLayer.add(this.ruler)
     // 控制器相关
     this.orbitControler = new OrbitControler(this.scene)
-    this.orbitControler.maxZoom = 10
-    this.orbitControler.minZoom = 0.1
+    this.orbitControler.maxZoom = 60
+    this.orbitControler.minZoom = 0.02
     this.orbitControler.addEventListener('change', () => {
       this.scene.render()
-      console.log('====zoom===', this.scene.camera.zoom)
     })
     this.scene.render()
     // tool管理
@@ -123,11 +122,11 @@ export class Editor {
   }
   /** 鼠标移动 */
   pointermove = _.throttle((event: PointerEvent) => {
-    const { clientX, clientY } = event
-    const mouseCoordPos = this.scene.clientToCoord(clientX, clientY)
+    // const { clientX, clientY } = event
+    // const mouseCoordPos = this.scene.clientToCoord(clientX, clientY)
     this.toolManager.pointermove(event)
-    const obj = this.dynamicLayer.isPointInGraph(mouseCoordPos)
-    // console.log('obj', obj)
+    // const obj = this.dynamicLayer.isPointInGraph(mouseCoordPos)
+    // // console.log('obj', obj)
   }, 10)
   /** 鼠标松开 */
   pointerup = (event: PointerEvent) => {
@@ -164,7 +163,9 @@ export class Editor {
     if (!this.selectImg) return
     const { clientX, clientY } = event
     const coordinate = this.scene.clientToCoord(clientX, clientY)
+
     const pattern = new Img({
+      name: this.selectImg.alt,
       image: this.selectImg,
       position: coordinate,
       size: new Vector2(70, 50),
@@ -176,6 +177,13 @@ export class Editor {
     ) as SelectHelper
     selectHelper.clear()
     selectHelper.add(pattern)
+    this.scene.render()
+  }
+  /** 设置缩放大小 */
+  setZoom(zoom: number) {
+    const { orbitControler, scene } = this
+    scene.camera.zoom = zoom
+    orbitControler.setZoom()
     this.scene.render()
   }
   /**  放大 */
@@ -205,7 +213,7 @@ export class Editor {
     const hoverHelper = this.dynamicLayer.getObjectByName(
       'hoverHelper'
     ) as HoverHelper
-    if (!selectHelper) return
+    if (!selectHelper || !hoverHelper) return
     for (const obj of selectHelper.children) {
       hoverHelper.remove(obj)
       obj.remove()
@@ -367,7 +375,7 @@ export class Editor {
     })
     /* 按住左键平移 */
     this.domElement.addEventListener('pointerdown', this.pointerdown)
-    window.addEventListener('pointermove', this.pointermove)
+    this.domElement.addEventListener('pointermove', this.pointermove)
     window.addEventListener('pointerup', this.pointerup)
     window.addEventListener('resize', this.resize)
   }
@@ -379,5 +387,6 @@ export class Editor {
     window.removeEventListener('pointermove', this.pointermove)
     window.removeEventListener('pointerup', this.pointerup)
     window.removeEventListener('resize', this.resize)
+    this.inactiveKeyboard()
   }
 }

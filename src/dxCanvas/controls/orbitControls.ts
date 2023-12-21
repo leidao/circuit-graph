@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:27:07
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-12 16:48:13
+ * @LastEditTime: 2023-12-21 14:38:39
  */
 
 import { Camera } from '../core/camera'
@@ -119,14 +119,16 @@ export class OrbitControler extends EventDispatcher {
     const scale = Math.pow(0.95, zoomSpeed)
 
     if (deltaY > 0) {
-      if (camera.zoom < this.minZoom && this.minZoom !== Infinity) return
-
       camera.zoom *= scale
+      if (camera.zoom < this.minZoom && this.minZoom !== Infinity) {
+        camera.zoom = this.minZoom
+      }
     } else {
-      if (camera.zoom > this.maxZoom && this.maxZoom !== Infinity) return
       camera.zoom /= scale
+      if (camera.zoom > this.maxZoom && this.maxZoom !== Infinity) {
+        camera.zoom = this.maxZoom
+      }
     }
-
     this.setZoom(new Vector2(clientX, clientY))
 
     const _changeEvent = {

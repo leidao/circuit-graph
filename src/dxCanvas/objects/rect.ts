@@ -25,6 +25,7 @@ export class Rect extends Object2D {
   // 类型
   readonly isLineSegments = true
   readonly isRect = true
+  name = 'Rect'
   constructor(attr: LineType = {}) {
     super()
     this.setOption(attr)

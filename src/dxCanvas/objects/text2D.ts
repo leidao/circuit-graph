@@ -41,6 +41,7 @@ class Text2D extends Object2D {
   style: TextStyle = new TextStyle()
   offset = new Vector2(0, 0)
   pickingBuffer = 4
+  name = 'Text2D'
   // 类型
   readonly isText = true
 

@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-19 15:39:29
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 09:33:01
+ * @LastEditTime: 2023-12-21 10:31:24
  */
 import { Vector2 } from '../math/vector2'
 import { calculateDistanceToLine, crtPath } from '../objects/objectUtils'
@@ -150,7 +150,7 @@ class SelectHelper extends Helper {
       }
     }
 
-    /* y向缩放 */
+    /* x向缩放 */
     distance = calculateDistanceToLine(
       scene.coordToCanvas(mp),
       scene.coordToCanvas(new Vector2(x1, y0)),
@@ -158,8 +158,8 @@ class SelectHelper extends Helper {
     )
     _bool = distance <= 4
     if (_bool) {
-      this.state = 'scaleY'
-      return 'scaleY'
+      this.state = 'scaleX'
+      return 'scaleX'
     }
     distance = calculateDistanceToLine(
       scene.coordToCanvas(mp),
@@ -168,11 +168,11 @@ class SelectHelper extends Helper {
     )
     _bool = distance <= 4
     if (_bool) {
-      this.state = 'scaleY'
-      return 'scaleY'
+      this.state = 'scaleX'
+      return 'scaleX'
     }
     scene.coordToCanvas(mp)
-    /* x向缩放 */
+    /* y向缩放 */
     distance = calculateDistanceToLine(
       scene.coordToCanvas(mp),
       scene.coordToCanvas(new Vector2(x0, y0)),
@@ -180,8 +180,8 @@ class SelectHelper extends Helper {
     )
     _bool = distance <= 4
     if (_bool) {
-      this.state = 'scaleX'
-      return 'scaleX'
+      this.state = 'scaleY'
+      return 'scaleY'
     }
     distance = calculateDistanceToLine(
       scene.coordToCanvas(mp),
@@ -190,8 +190,8 @@ class SelectHelper extends Helper {
     )
     _bool = distance <= 4
     if (_bool) {
-      this.state = 'scaleX'
-      return 'scaleX'
+      this.state = 'scaleY'
+      return 'scaleY'
     }
 
     /* 移动 */
@@ -227,8 +227,8 @@ class SelectHelper extends Helper {
     this.drawScale(ctx, new Vector2().subVectors(center, mousePos).angle())
   }
 
-  // scaleY状态
-  scaleYCursor(ctx: CanvasRenderingContext2D) {
+  // scaleX 状态
+  scaleXCursor(ctx: CanvasRenderingContext2D) {
     const { center, vertices } = this
     this.drawScale(
       ctx,
@@ -243,8 +243,8 @@ class SelectHelper extends Helper {
     )
   }
 
-  // scaleX 状态
-  scaleXCursor(ctx: CanvasRenderingContext2D) {
+  // scaleY 状态
+  scaleYCursor(ctx: CanvasRenderingContext2D) {
     const { center, vertices } = this
     this.drawScale(
       ctx,

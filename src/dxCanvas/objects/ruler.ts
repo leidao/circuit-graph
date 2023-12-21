@@ -40,6 +40,7 @@ export class Ruler extends Object2D {
   config: RulerConfig
   /** 不受相机影响 */
   enableCamera = false
+  name = 'Ruler'
   // 类型
   readonly isRuler = true
   constructor(config: RulerConfig) {
@@ -118,12 +119,14 @@ export class Ruler extends Object2D {
       ctx.lineTo(x, y - config.h)
       ctx.fillText(String(startXInScene), x + 3, y - 11)
 
-      for (let i = 1; i < 10; i++) {
-        ctx.moveTo(x + (i * stepInScene * zoom) / 10, y)
-        ctx.lineTo(
-          x + (i * stepInScene * zoom) / 10,
-          i === 5 ? y - config.h + 4 : y - config.h + 8
-        )
+      if (![1, 2].includes(stepInScene)) {
+        for (let i = 1; i < 10; i++) {
+          ctx.moveTo(x + (i * stepInScene * zoom) / 10, y)
+          ctx.lineTo(
+            x + (i * stepInScene * zoom) / 10,
+            i === 5 ? y - config.h + 4 : y - config.h + 8
+          )
+        }
       }
 
       ctx.stroke()
@@ -162,13 +165,16 @@ export class Ruler extends Object2D {
       ctx.rotate((-90 * Math.PI) / 180)
       ctx.fillText(String(startYInScene), 0, 0)
       ctx.restore()
-      for (let i = 1; i < 10; i++) {
-        ctx.moveTo(x, y + (i * stepInScene * zoom) / 10)
-        ctx.lineTo(
-          i === 5 ? x - config.h + 4 : x - config.h + 8,
-          y + (i * stepInScene * zoom) / 10
-        )
+      if (![1, 2].includes(stepInScene)) {
+        for (let i = 1; i < 10; i++) {
+          ctx.moveTo(x, y + (i * stepInScene * zoom) / 10)
+          ctx.lineTo(
+            i === 5 ? x - config.h + 4 : x - config.h + 8,
+            y + (i * stepInScene * zoom) / 10
+          )
+        }
       }
+
       ctx.stroke()
       ctx.closePath()
 

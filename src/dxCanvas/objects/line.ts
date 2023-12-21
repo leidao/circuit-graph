@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-20 10:46:00
+ * @LastEditTime: 2023-12-21 17:12:50
  */
 import { Vector2 } from '../math/vector2'
 import { BasicStyle } from '../style/basicStyle'
@@ -25,6 +25,7 @@ export class Line extends Object2D {
   pickingBuffer = 4
   // 类型
   readonly isLine = true
+  name = 'Line'
   readonly isLineSegments = true
   constructor(attr: LineType = {}) {
     super()
