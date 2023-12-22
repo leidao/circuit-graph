@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-01 17:17:18
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 17:33:29
+ * @LastEditTime: 2023-12-21 21:03:57
  */
 
 import _ from 'lodash'
@@ -375,7 +375,7 @@ export class Editor {
     })
     /* 按住左键平移 */
     this.domElement.addEventListener('pointerdown', this.pointerdown)
-    this.domElement.addEventListener('pointermove', this.pointermove)
+    window.addEventListener('pointermove', this.pointermove)
     window.addEventListener('pointerup', this.pointerup)
     window.addEventListener('resize', this.resize)
   }
