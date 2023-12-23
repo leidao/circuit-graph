@@ -3,15 +3,12 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-23 21:45:46
+ * @LastEditTime: 2023-12-23 22:04:25
  */
 import { Camera, dpr } from '../core/camera'
 import { sceneParam } from '../core/scene'
-import { Matrix3 } from '../math/matrix3'
-import { Vector2 } from '../math/vector2'
 import { Group } from './group'
-import { Img } from './img'
-import { Object2D, Object2DType } from './object2D'
+import { Object2DType } from './object2D'
 export class Layer extends Group {
   // 类型
   readonly isLayer = true

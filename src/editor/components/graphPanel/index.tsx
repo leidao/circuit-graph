@@ -3,9 +3,10 @@
  * @Author: ldx
  * @Date: 2023-12-21 15:26:11
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-22 23:21:29
+ * @LastEditTime: 2023-12-23 22:52:49
  */
 import { Empty, InputNumber } from 'antd'
+import Big from 'big.js'
 import { useContext, useEffect, useState } from 'react'
 
 import { Object2D, SelectHelper } from '@/dxCanvas'
@@ -23,6 +24,7 @@ const GraphPanel = () => {
     const selectHelper = editor.dynamicLayer.getObjectByName(
       'selectHelper'
     ) as SelectHelper
+    if (!selectHelper) return
     const changeHelper = (event: {
       type: string
       target?: any
@@ -31,22 +33,23 @@ const GraphPanel = () => {
       const target = event.target
       if (target instanceof SelectHelper) {
         const obj = target.children[0]
+        setSetlectGraph(obj)
         if (!obj) return
-        // obj.computeBoundingBox()
         const { min, max } = obj.boundingBox
-        console.log('min', min.clone())
-
         setX(obj.position.x)
         setY(obj.position.y)
-        setW(max.x - min.x)
-        setH(max.y - min.y)
+        setW(Number(new Big(max.x).minus(min.x).toFixed(3)))
+        setH(Number(new Big(max.y).minus(min.y).toFixed(3)))
         setR(obj.rotate)
-        setSetlectGraph(obj)
       }
     }
-    selectHelper && selectHelper.addEventListener('change_helper', changeHelper)
+    selectHelper.addEventListener('change_helper', changeHelper)
+    selectHelper.addEventListener('graphOperation', changeHelper)
+    return () => {
+      selectHelper.removeEventListener('change_helper', changeHelper)
+      selectHelper.removeEventListener('graphOperation', changeHelper)
+    }
   }, [editor])
-  console.log('selectGraph', selectGraph)
 
   return (
     <div className="w-100% h-100%">
@@ -64,7 +67,12 @@ const GraphPanel = () => {
             <InputNumber
               size="small"
               className="w-100px"
-              onChange={(value) => {}}
+              onChange={(value) => {
+                if (!value) return
+                setX(value)
+              }}
+              min={Infinity}
+              max={Infinity}
               prefix="X"
               value={x}
             />

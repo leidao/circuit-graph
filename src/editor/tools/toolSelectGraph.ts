@@ -3,8 +3,10 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-23 21:41:04
+ * @LastEditTime: 2023-12-23 22:47:31
  */
+import Big from 'big.js'
+
 import { HoverHelper, SelectHelper, Vector2 } from '@/dxCanvas'
 import { State } from '@/dxCanvas/helpers/selectHelper'
 
@@ -67,18 +69,21 @@ class ToolSelectGraph extends ToolBase {
     if (this.isDown) {
       // 下面是平移、旋转、缩放的操作
       console.log('this.cursorState', this.cursorState)
+      const delta = mouseCoordPos.clone().sub(this.mouseCoordPos)
+
       switch (this.cursorState) {
         case 'move':
           for (const obj of this.selectHelper.children) {
             if (obj.userData.lock) continue
-            const delta = mouseCoordPos.clone().sub(this.mouseCoordPos)
-            obj.position = obj.position.clone().add(delta)
+            const position = obj.position.clone().add(delta)
+            position.x = Number(new Big(position.x).toFixed(3))
+            position.y = Number(new Big(position.y).toFixed(3))
+            obj.position.copy(position)
           }
           break
         case 'scaleX':
           for (const obj of this.selectHelper.children) {
             if (obj.userData.lock) continue
-            const delta = mouseCoordPos.clone().sub(this.downCoordPos)
             const { min, max } = obj.boundingBox
             const width = max.x - min.x
             const num =
@@ -90,7 +95,11 @@ class ToolSelectGraph extends ToolBase {
         default:
           break
       }
-
+      this.editor.scene.computeBoundingBox()
+      this.selectHelper.dispatchEvent({
+        type: 'graphOperation',
+        target: this.selectHelper
+      })
       // 鼠标样式同步更新位置
       this.selectHelper.setMousePosition(mouseCoordPos)
       // this.selectHelper.getMouseState(mouseCoordPos)

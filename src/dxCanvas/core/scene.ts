@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-23 21:30:37
+ * @LastEditTime: 2023-12-23 22:06:48
  */
 import { Vector2 } from '../math/vector2'
 import { Layer } from '../objects/layer'
@@ -173,5 +173,12 @@ export class Scene extends EventDispatcher {
       if (obj) return obj
     }
     return false
+  }
+  /** 获取包围盒数据 该操作会重新计算图层内所有的包围盒 */
+  computeBoundingBox(children = this.children) {
+    for (let i = 0; i < children.length; i++) {
+      const layer = children[i]
+      layer.computeBoundingBox()
+    }
   }
 }
