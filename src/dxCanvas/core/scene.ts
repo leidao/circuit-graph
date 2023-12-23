@@ -3,11 +3,9 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 14:28:46
+ * @LastEditTime: 2023-12-23 21:30:37
  */
-import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
-import { Img } from '../objects/img'
 import { Layer } from '../objects/layer'
 import { Object2D } from '../objects/object2D'
 import { Camera } from './camera'

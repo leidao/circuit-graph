@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-19 15:33:28
+ * @LastEditTime: 2023-12-23 21:45:46
  */
 import { Camera, dpr } from '../core/camera'
 import { sceneParam } from '../core/scene'
@@ -67,8 +67,8 @@ export class Layer extends Group {
     // 清理画布
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     autoClear && ctx.clearRect(0, 0, width, height)
-
-    this.computeBoundingBox()
+    // 优化，不全量计算包围盒，只计算操作（平移、旋转、缩放）后的图形包围盒和组下修改的包围盒（add、remove、clear）
+    // this.computeBoundingBox()
 
     // 判断layer内的图形是否都在视口内
     const viewportBounds = this.viewportBounds
@@ -89,5 +89,26 @@ export class Layer extends Group {
     }
 
     ctx.restore()
+  }
+  /** 获取包围盒数据 该操作会重新计算图层内所有的包围盒 */
+  computeBoundingBox() {
+    const {
+      children,
+      boundingBox: { min, max }
+    } = this
+    // 根据点计算边界
+    let minX = Infinity
+    let minY = Infinity
+    let maxX = -Infinity
+    let maxY = -Infinity
+    for (const child of children) {
+      child.computeBoundingBox()
+      minX = Math.min(minX, child.boundingBox.min.x)
+      minY = Math.min(minY, child.boundingBox.min.y)
+      maxX = Math.max(maxX, child.boundingBox.max.x)
+      maxY = Math.max(maxY, child.boundingBox.max.y)
+    }
+    min.set(minX, minY)
+    max.set(maxX, maxY)
   }
 }

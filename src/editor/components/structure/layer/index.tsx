@@ -8,8 +8,9 @@ import { HideOutlined, LockFilled, ShowOutlined, UnlockFilled } from './icons'
 const Layer = () => {
   const editor = useContext(EditorContext)
   const [list, setList] = useState<Object2D[]>([])
-  const [selected, setSelected] = useState<string[]>([])
+  const [selectgraph, setSetlectGraph] = useState<string[]>([])
   const [hoverId, setHoverId] = useState<string>('')
+  const [, forceUpdate] = useState<object>()
   useEffect(() => {
     if (!editor) return
     const baseLayer = editor.baseLayer
@@ -27,7 +28,7 @@ const Layer = () => {
         setHoverId(target.children[0]?.uuid || '')
       }
       if (target instanceof SelectHelper) {
-        setSelected(target.children.map((obj) => obj.uuid))
+        setSetlectGraph(target.children.map((obj) => obj.uuid))
       }
     }
     baseLayer.addEventListener('change', change)
@@ -41,6 +42,10 @@ const Layer = () => {
     hoverHelper && hoverHelper.addEventListener('change_helper', changeHelper)
     return () => {
       baseLayer.removeEventListener('change', change)
+      selectHelper &&
+        selectHelper.removeEventListener('change_helper', changeHelper)
+      hoverHelper &&
+        hoverHelper.removeEventListener('change_helper', changeHelper)
     }
   }, [editor])
 
@@ -79,13 +84,17 @@ const Layer = () => {
                 }}
                 style={{
                   borderColor: hoverId === obj.uuid ? '#0f8fff' : 'transparent',
-                  background: selected.includes(obj.uuid) ? '#e1f2ff' : '#fff'
+                  background: selectgraph.includes(obj.uuid)
+                    ? '#e1f2ff'
+                    : '#fff'
                 }}
               >
                 <div
                   className="h-32px px-24px flex justify-between items-center cursor-pointer"
                   onClick={() => {
-                    setSelected(Array.from(new Set(selected.concat(obj.uuid))))
+                    setSetlectGraph(
+                      Array.from(new Set(selectgraph.concat(obj.uuid)))
+                    )
                     if (!editor) return
                     const selectHelper = editor.dynamicLayer.getObjectByName(
                       'selectHelper'
@@ -96,13 +105,19 @@ const Layer = () => {
                     editor.dynamicLayer.render()
                   }}
                 >
-                  <span>{obj.name}</span>
+                  <span style={{ color: !obj.visible ? '#0000004d' : '#333' }}>
+                    {obj.name}
+                  </span>
                 </div>
                 <span className="flex items-center absolute top-5px right-18px">
                   <span
                     className="w-22px h-22px rounded-4px mr-2px hover:bg-#dcdcdc flex items-center justify-center"
                     style={{
                       opacity: hoverId === obj.uuid || obj.userData.lock ? 1 : 0
+                    }}
+                    onClick={() => {
+                      obj.userData.lock = !obj.userData.lock
+                      forceUpdate({})
                     }}
                   >
                     {obj.userData.lock ? <LockFilled /> : <UnlockFilled />}
@@ -111,6 +126,11 @@ const Layer = () => {
                     className="w-22px h-22px rounded-4px hover:bg-#dcdcdc flex items-center justify-center"
                     style={{
                       opacity: hoverId === obj.uuid || !obj.visible ? 1 : 0
+                    }}
+                    onClick={() => {
+                      obj.visible ? obj.hide() : obj.show()
+                      forceUpdate({})
+                      editor?.baseLayer.render()
                     }}
                   >
                     {obj.visible ? <ShowOutlined /> : <HideOutlined />}

@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 20:25:30
+ * @LastEditTime: 2023-12-23 21:36:24
  */
 import { Vector2 } from '../math/vector2'
 import { BasicStyle } from '../style/basicStyle'
@@ -19,8 +19,6 @@ type LineType = Object2DType & {
 
 export class Line extends Object2D {
   style: StandStyle = new StandStyle()
-  /** 点位集合 */
-  points: [number, number][] = []
   /** 图层拾取缓存机制，如 1px 宽度的线鼠标很难拾取(点击)到, 通过设置该参数可扩大拾取的范围 */
   pickingBuffer = 4
   // 类型
@@ -44,23 +42,22 @@ export class Line extends Object2D {
       }
     }
   }
-  /** 样式设置 */
-  setStyle(attr: StandStyleType) {
-    this.style.setOption(attr)
-  }
 
   /** 设置点位 */
   setPoints(points: [number, number][]) {
     this.points = points
+    this.computeBoundingBox()
   }
   /** 追加点位 */
   addPoints(...rest: [number, number][]) {
     this.points.push(...rest)
+    this.computeBoundingBox()
   }
   /** 替换坐标 */
   replacePoints(i: number, n: number, ...rest: [number, number][]) {
     const { points } = this
     points.splice(i, n, ...rest)
+    this.computeBoundingBox()
   }
   /* 绘图 */
   drawShape(ctx: CanvasRenderingContext2D, externalStyle?: BasicStyle) {
@@ -128,6 +125,7 @@ export class Line extends Object2D {
       const { points, pickingBuffer } = this
       const scene = this.getScene()
       if (!scene) return false
+      // 计算线宽，包围盒计算时需要考虑线宽
       const len = this.style.lineWidth * scene.camera.zoom
 
       for (let i = 0; i < points.length - 1; i++) {

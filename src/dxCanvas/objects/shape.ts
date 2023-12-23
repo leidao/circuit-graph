@@ -3,14 +3,14 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 20:29:00
+ * @LastEditTime: 2023-12-23 21:35:14
  */
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
 import { BasicStyle } from '../style/basicStyle'
 import { StandStyle, StandStyleType } from '../style/standStyle'
 import { Object2D, Object2DType } from './object2D'
-import { crtPath, crtPathByMatrix } from './objectUtils'
+import { crtPath } from './objectUtils'
 
 type ShapeType = Object2DType & {
   style?: StandStyleType
@@ -19,9 +19,6 @@ type ShapeType = Object2DType & {
 
 export class Shape extends Object2D {
   style: StandStyle = new StandStyle()
-  /** 点位集合 */
-  points: [number, number][] = []
-
   // 类型
   readonly isLineSegments = true
   readonly isShape = true
@@ -51,23 +48,22 @@ export class Shape extends Object2D {
       }
     }
   }
-  /** 样式设置 */
-  setStyle(attr: StandStyleType) {
-    this.style.setOption(attr)
-  }
 
   /** 设置点位 */
   setPoints(points: [number, number][]) {
     this.points = points
+    this.computeBoundingBox()
   }
   /** 追加点位 */
   addPoints(points: [number, number][]) {
     this.points = this.points.concat(points)
+    this.computeBoundingBox()
   }
   /** 替换最后一个坐标 */
   replacePoint(point: [number, number]) {
     const { points } = this
     points.splice(points.length - 1, 1, point)
+    this.computeBoundingBox()
   }
   /* 绘图 */
   drawShape(ctx: CanvasRenderingContext2D, externalStyle?: BasicStyle) {

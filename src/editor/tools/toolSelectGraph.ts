@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 21:05:57
+ * @LastEditTime: 2023-12-23 21:41:04
  */
 import { HoverHelper, SelectHelper, Vector2 } from '@/dxCanvas'
 import { State } from '@/dxCanvas/helpers/selectHelper'
@@ -45,10 +45,11 @@ class ToolSelectGraph extends ToolBase {
     }
 
     const obj = this.editor.baseLayer.isPointInGraph(this.downCoordPos)
-    if (obj) {
+    if (obj && !obj.userData.lock) {
       this.selectHelper.add(obj)
-      this.selectHelper.computeBoundingBox()
-      this.cursorState = this.selectHelper.getMouseState(this.downCoordPos)
+      // this.selectHelper.computeBoundingBox()
+      this.selectHelper.setMousePosition(this.downCoordPos)
+      this.cursorState = this.selectHelper.getMouseState()
       // 在图形中按下鼠标
       this.isDown = true
     }
@@ -66,16 +67,17 @@ class ToolSelectGraph extends ToolBase {
     if (this.isDown) {
       // 下面是平移、旋转、缩放的操作
       console.log('this.cursorState', this.cursorState)
-
       switch (this.cursorState) {
         case 'move':
           for (const obj of this.selectHelper.children) {
+            if (obj.userData.lock) continue
             const delta = mouseCoordPos.clone().sub(this.mouseCoordPos)
             obj.position = obj.position.clone().add(delta)
           }
           break
         case 'scaleX':
           for (const obj of this.selectHelper.children) {
+            if (obj.userData.lock) continue
             const delta = mouseCoordPos.clone().sub(this.downCoordPos)
             const { min, max } = obj.boundingBox
             const width = max.x - min.x
@@ -90,7 +92,8 @@ class ToolSelectGraph extends ToolBase {
       }
 
       // 鼠标样式同步更新位置
-      this.selectHelper.getMouseState(mouseCoordPos)
+      this.selectHelper.setMousePosition(mouseCoordPos)
+      // this.selectHelper.getMouseState(mouseCoordPos)
       this.mouseCoordPos = mouseCoordPos.clone()
       this.editor.baseLayer.render()
     } else {
@@ -103,7 +106,8 @@ class ToolSelectGraph extends ToolBase {
       }
       // 先判断是否有选中图形，在判断是否绘制鼠标样式
       if (this.selectHelper.children.length > 0) {
-        this.cursorState = this.selectHelper.getMouseState(mouseCoordPos)
+        this.selectHelper.setMousePosition(mouseCoordPos)
+        this.cursorState = this.selectHelper.getMouseState()
         if (this.cursorState) {
           this.editor.cursorManager.setCursor('none')
         } else {

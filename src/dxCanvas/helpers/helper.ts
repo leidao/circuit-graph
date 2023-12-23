@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-19 15:39:29
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 17:49:30
+ * @LastEditTime: 2023-12-23 21:40:13
  */
 import { Group } from '../objects/group'
 import { Object2D, Object2DType } from '../objects/object2D'
@@ -56,11 +56,12 @@ abstract class Helper extends Group {
       this.children.push(obj)
       this.dispatchEvent({ type: 'add_helper', target: obj })
     }
+    this.sort()
+    this.computeBoundingBox()
     this.dispatchEvent({
       type: 'change_helper',
       target: this
     })
-    this.sort()
     return this
   }
 
@@ -74,6 +75,7 @@ abstract class Helper extends Group {
         this.dispatchEvent({ type: 'remove_helper', target: obj })
       }
     }
+    this.computeBoundingBox()
     this.dispatchEvent({
       type: 'change_helper',
       target: this
@@ -87,6 +89,7 @@ abstract class Helper extends Group {
       this.dispatchEvent({ type: 'removed_helper', target: obj })
     }
     this.children = []
+    this.computeBoundingBox()
     this.dispatchEvent({
       type: 'change_helper',
       target: this

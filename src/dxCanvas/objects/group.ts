@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 20:25:25
+ * @LastEditTime: 2023-12-23 21:38:53
  */
 import { Vector2 } from '../math/vector2'
 import { Object2D, Object2DType } from './object2D'
@@ -32,11 +32,13 @@ export class Group extends Object2D {
       }
       obj.parent && obj.remove()
       obj.parent = this
+      obj.computeBoundingBox()
       this.children.push(obj)
       this.dispatchEvent({ type: 'add', target: obj })
     }
-    this.dispatchEvent({ type: 'change', target: this })
     this.sort()
+    this.computeBoundingBox()
+    this.dispatchEvent({ type: 'change', target: this })
     return this
   }
 
@@ -57,6 +59,7 @@ export class Group extends Object2D {
         }
       }
     }
+    this.computeBoundingBox()
     this.dispatchEvent({ type: 'change', target: this })
     return this
   }
@@ -67,8 +70,9 @@ export class Group extends Object2D {
       obj.parent = undefined
       this.dispatchEvent({ type: 'removed', target: obj })
     }
-    this.dispatchEvent({ type: 'change', target: this })
     this.children = []
+    this.computeBoundingBox()
+    this.dispatchEvent({ type: 'change', target: this })
     return this
   }
 
@@ -161,7 +165,6 @@ export class Group extends Object2D {
     let maxX = -Infinity
     let maxY = -Infinity
     for (const child of children) {
-      child.computeBoundingBox()
       minX = Math.min(minX, child.boundingBox.min.x)
       minY = Math.min(minY, child.boundingBox.min.y)
       maxX = Math.max(maxX, child.boundingBox.max.x)

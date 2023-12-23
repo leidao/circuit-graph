@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2022-04-06 19:34:55
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 16:16:26
+ * @LastEditTime: 2023-12-22 22:39:10
  */
 import { useEffect, useRef, useState } from 'react'
 
@@ -12,7 +12,7 @@ const preventDefaultScalePage = (event: WheelEvent) => {
     event.preventDefault()
   }
 }
-import PicAssets from './components/picAssets'
+import GraphPanel from './components/graphPanel'
 import Structure from './components/structure'
 import ToolBar from './components/toolbar'
 import EditorContext from './context'
@@ -53,7 +53,9 @@ const Home = () => {
             {/* <canvas  className="w-100% h-100%"></canvas> */}
           </div>
         </div>
-        <div className="w-240px h-100% border-l-1px border-#dadadc99"></div>
+        <div className="w-240px h-100% border-l-1px border-#dadadc99">
+          <GraphPanel></GraphPanel>
+        </div>
       </div>
     </EditorContext.Provider>
   )

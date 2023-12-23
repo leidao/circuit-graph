@@ -122,11 +122,14 @@ class SelectHelper extends Helper {
 
     ctx.restore()
   }
+  setMousePosition(mp: Vector2) {
+    this.mousePos.copy(mp.clone())
+  }
   /* 获取变换状态 */
-  getMouseState(mp: Vector2): State {
+  getMouseState(): State {
     const scene = this.getScene()
     if (!scene) return null
-    this.mousePos.copy(mp.clone())
+
     const {
       boundingBox: {
         min: { x: x0, y: y0 },
@@ -141,7 +144,7 @@ class SelectHelper extends Helper {
       if (
         scene
           .coordToCanvas(new Vector2(x, y))
-          .sub(scene.coordToCanvas(mp))
+          .sub(scene.coordToCanvas(this.mousePos))
           .length() < 8
       ) {
         // const ind = (i + 8) % 16
@@ -152,7 +155,7 @@ class SelectHelper extends Helper {
 
     /* x向缩放 */
     distance = calculateDistanceToLine(
-      scene.coordToCanvas(mp),
+      scene.coordToCanvas(this.mousePos),
       scene.coordToCanvas(new Vector2(x1, y0)),
       scene.coordToCanvas(new Vector2(x1, y1))
     )
@@ -162,7 +165,7 @@ class SelectHelper extends Helper {
       return 'scaleX'
     }
     distance = calculateDistanceToLine(
-      scene.coordToCanvas(mp),
+      scene.coordToCanvas(this.mousePos),
       scene.coordToCanvas(new Vector2(x0, y0)),
       scene.coordToCanvas(new Vector2(x0, y1))
     )
@@ -171,10 +174,10 @@ class SelectHelper extends Helper {
       this.state = 'scaleX'
       return 'scaleX'
     }
-    scene.coordToCanvas(mp)
+    scene.coordToCanvas(this.mousePos)
     /* y向缩放 */
     distance = calculateDistanceToLine(
-      scene.coordToCanvas(mp),
+      scene.coordToCanvas(this.mousePos),
       scene.coordToCanvas(new Vector2(x0, y0)),
       scene.coordToCanvas(new Vector2(x1, y0))
     )
@@ -184,7 +187,7 @@ class SelectHelper extends Helper {
       return 'scaleY'
     }
     distance = calculateDistanceToLine(
-      scene.coordToCanvas(mp),
+      scene.coordToCanvas(this.mousePos),
       scene.coordToCanvas(new Vector2(x0, y1)),
       scene.coordToCanvas(new Vector2(x1, y1))
     )
@@ -195,7 +198,11 @@ class SelectHelper extends Helper {
     }
 
     /* 移动 */
-    _bool = mp.x >= x0 && mp.x <= x1 && mp.y >= y0 && mp.y <= y1
+    _bool =
+      this.mousePos.x >= x0 &&
+      this.mousePos.x <= x1 &&
+      this.mousePos.y >= y0 &&
+      this.mousePos.y <= y1
     if (_bool) {
       this.state = 'move'
       return 'move'
@@ -208,7 +215,7 @@ class SelectHelper extends Helper {
       if (
         scene
           .coordToCanvas(new Vector2(x, y))
-          .sub(scene.coordToCanvas(mp))
+          .sub(scene.coordToCanvas(this.mousePos))
           .length() < 22
       ) {
         this.state = 'rotate'

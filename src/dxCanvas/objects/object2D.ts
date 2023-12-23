@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-20 12:27:11
+ * @LastEditTime: 2023-12-23 21:21:25
  */
 import { EventDispatcher } from '../core/eventDispatcher'
 import { Scene } from '../core/scene'
@@ -60,6 +60,8 @@ export abstract class Object2D extends EventDispatcher {
     min: new Vector2(),
     max: new Vector2()
   }
+  /** 点位集合 */
+  protected points: [number, number][] = []
   /** 类型 */
   readonly isObject2D = true
   /** 中点 */
@@ -122,7 +124,15 @@ export abstract class Object2D extends EventDispatcher {
       max: viewportmax
     }
   }
-
+  /** 获取点位数据 */
+  getPoistion(): [number, number][] {
+    return this.points
+  }
+  /** 样式设置 */
+  setStyle(attr: BasicStyle) {
+    this.style.setOption(attr)
+    this.computeBoundingBox()
+  }
   /* 先变换(缩放+旋转)后位移 */
   transform(ctx: CanvasRenderingContext2D) {
     const { position, rotate, scale } = this

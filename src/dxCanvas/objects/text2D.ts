@@ -36,7 +36,7 @@ export const baselineRatio = {
 }
 
 class Text2D extends Object2D {
-  text = ''
+  private text = ''
   maxWidth: number | undefined
   style: TextStyle = new TextStyle()
   offset = new Vector2(0, 0)
@@ -56,7 +56,15 @@ class Text2D extends Object2D {
     } = this
     return super.worldMatrix.multiply(new Matrix3().makeTranslation(x, y))
   }
-
+  /** 设置文字内容 */
+  setText(text: string) {
+    this.text = text
+    this.computeBoundingBox()
+  }
+  /** 获取文字内容 */
+  getText(): string {
+    return this.text
+  }
   /* 视图投影矩阵*世界模型矩阵*偏移矩阵  */
   get pvmMatrix(): Matrix3 {
     const {

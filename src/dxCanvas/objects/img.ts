@@ -3,13 +3,12 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 17:12:32
+ * @LastEditTime: 2023-12-23 21:36:28
  */
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
 import { BasicStyle, BasicStyleType } from '../style/basicStyle'
 import { Object2D, Object2DType } from './object2D'
-import { crtPath, crtPathByMatrix } from './objectUtils'
 
 type ImgType = Object2DType & {
   image?: CanvasImageSource
@@ -40,7 +39,6 @@ export class Img extends Object2D {
     super()
     this.setOption(attr)
   }
-
   /* 属性设置 */
   setOption(attr: ImgType) {
     for (const [key, val] of Object.entries(attr)) {

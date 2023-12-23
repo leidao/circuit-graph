@@ -43,8 +43,7 @@ class ToolDrawText extends ToolBase {
   inputChange = (e: Event) => {
     if (e.target && this.text) {
       const value = (e.target as HTMLInputElement).value
-      this.text.text = value
-      this.text.computeBoundingBox()
+      this.text.setText(value)
       const {
         offset,
         size,

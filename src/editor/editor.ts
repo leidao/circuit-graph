@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-01 17:17:18
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 21:03:57
+ * @LastEditTime: 2023-12-23 21:12:18
  */
 
 import _ from 'lodash'
@@ -12,6 +12,7 @@ import {
   HoverHelper,
   Img,
   OrbitControler,
+  Rect,
   Scene,
   SelectHelper,
   Vector2
@@ -85,6 +86,7 @@ export class Editor {
     this.orbitControler.addEventListener('change', () => {
       this.scene.render()
     })
+
     this.scene.render()
     // tool管理
     this.toolManager = new ToolManager(this)
@@ -122,11 +124,11 @@ export class Editor {
   }
   /** 鼠标移动 */
   pointermove = _.throttle((event: PointerEvent) => {
-    // const { clientX, clientY } = event
-    // const mouseCoordPos = this.scene.clientToCoord(clientX, clientY)
+    const { clientX, clientY } = event
+    const mouseCoordPos = this.scene.clientToCoord(clientX, clientY)
     this.toolManager.pointermove(event)
-    // const obj = this.dynamicLayer.isPointInGraph(mouseCoordPos)
-    // // console.log('obj', obj)
+    const obj = this.dynamicLayer.isPointInGraph(mouseCoordPos)
+    // console.log('obj', obj)
   }, 10)
   /** 鼠标松开 */
   pointerup = (event: PointerEvent) => {
@@ -318,6 +320,12 @@ export class Editor {
 
     this.scene.render()
   }
+  /** 标尺的显示和隐藏 */
+  setRulerVisible = () => {
+    const ruler = this?.dynamicLayer.getObjectByName('Ruler') as Ruler
+    ruler.visible ? ruler.hide() : ruler.show()
+    this.dynamicLayer.render()
+  }
   /** 激活快捷键 */
   activeKeyboard() {
     // 删除
@@ -355,6 +363,12 @@ export class Editor {
       name: 'showSelectGraph',
       keyboard: ['ctrl+2'],
       execute: this.showSelectGraph
+    })
+    // 适应选中图形
+    this.keybordManager.registry({
+      name: 'setRulerVisible',
+      keyboard: ['shift+r'],
+      execute: this.setRulerVisible
     })
   }
 

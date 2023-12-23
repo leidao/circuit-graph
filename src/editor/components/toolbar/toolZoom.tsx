@@ -3,17 +3,16 @@
  * @Author: ldx
  * @Date: 2023-12-21 11:28:43
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-21 15:25:30
+ * @LastEditTime: 2023-12-22 22:01:22
  */
 import { useClickAway } from 'ahooks'
 import { InputNumber, Space } from 'antd'
-import { useWatch } from 'antd/es/form/Form'
 import { useContext, useEffect, useRef, useState } from 'react'
 
-import { Camera } from '@/dxCanvas'
+import { Ruler } from '@/dxCanvas'
 import EditorContext from '@/editor/context'
 
-import { DownOutlined } from './icons'
+import { CheckOutlined, DownOutlined } from './icons'
 export const isWindows =
   navigator.platform.toLowerCase().includes('win') ||
   navigator.userAgent.includes('Windows')
@@ -21,6 +20,7 @@ export const isWindows =
 const ToolZoom = () => {
   const editor = useContext(EditorContext)
   const [open, setOpen] = useState(false)
+  const [rulerVisible, setRulerVisible] = useState(false)
   const [zoom, setZoom] = useState(100)
   const containerRef = useRef<HTMLDivElement>(null)
   useClickAway(() => {
@@ -99,18 +99,45 @@ const ToolZoom = () => {
           {zoomActions.map((action) => {
             return (
               <div
-                className="flex justify-between items-center text-12px mx-24px h-24px cursor-pointer"
+                className="flex justify-between items-center text-12px  h-24px cursor-pointer hover:bg-#e1f2ff"
                 key={action.key}
                 onClick={() => {
                   action.onClick()
                   setOpen(false)
                 }}
               >
-                <span>{action.leftText}</span>
-                <span>{action.rightText}</span>
+                <span className="flex justify-between items-center">
+                  <span className="w-24px h-24px"></span>
+                  <span>{action.leftText}</span>
+                </span>
+
+                <span className="mr-24px">{action.rightText}</span>
               </div>
             )
           })}
+          <div className="h-1px bg-#ddd my-6px"></div>
+          <div
+            className="flex justify-between items-center text-12px h-24px cursor-pointer hover:bg-#e1f2ff"
+            onClick={() => {
+              const ruler = editor?.dynamicLayer.getObjectByName(
+                'Ruler'
+              ) as Ruler
+              ruler.visible ? ruler.hide() : ruler.show()
+              setRulerVisible(ruler.visible)
+              editor?.dynamicLayer.render()
+              setOpen(false)
+            }}
+          >
+            <span className="flex justify-between items-center">
+              {rulerVisible ? (
+                <CheckOutlined />
+              ) : (
+                <span className="w-24px h-24px"></span>
+              )}
+              <span>标尺</span>
+            </span>
+            <span className="mr-24px">{isWindows ? 'Shift+R' : '⇧R'}</span>
+          </div>
         </div>
       )}
     </div>
