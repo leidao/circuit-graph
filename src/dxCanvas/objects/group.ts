@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-23 21:38:53
+ * @LastEditTime: 2024-01-03 13:23:05
  */
 import { Vector2 } from '../math/vector2'
 import { Object2D, Object2DType } from './object2D'
@@ -17,6 +17,7 @@ export class Group extends Object2D {
   constructor(attr: Object2DType = {}) {
     super()
     this.setOption(attr)
+    this.addEventListener('bound_change', this.computeBoundingBox)
   }
 
   /* 设置属性 */
@@ -35,9 +36,10 @@ export class Group extends Object2D {
       obj.computeBoundingBox()
       this.children.push(obj)
       this.dispatchEvent({ type: 'add', target: obj })
+      obj.addEventListener('bound_change', this.computeBoundingBox)
     }
     this.sort()
-    this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
     this.dispatchEvent({ type: 'change', target: this })
     return this
   }
@@ -51,6 +53,7 @@ export class Group extends Object2D {
         obj.parent = undefined
         this.children.splice(index, 1)
         this.dispatchEvent({ type: 'remove', target: obj })
+        obj.removeEventListener('bound_change', this.computeBoundingBox)
       } else {
         for (const child of children) {
           if (child instanceof Group) {
@@ -59,7 +62,7 @@ export class Group extends Object2D {
         }
       }
     }
-    this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
     this.dispatchEvent({ type: 'change', target: this })
     return this
   }
@@ -69,9 +72,10 @@ export class Group extends Object2D {
     for (const obj of this.children) {
       obj.parent = undefined
       this.dispatchEvent({ type: 'removed', target: obj })
+      obj.removeEventListener('bound_change', this.computeBoundingBox)
     }
     this.children = []
-    this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
     this.dispatchEvent({ type: 'change', target: this })
     return this
   }
@@ -154,7 +158,7 @@ export class Group extends Object2D {
     this.children.forEach((obj) => obj.crtPath(ctx))
   }
   /** 获取包围盒数据 */
-  computeBoundingBox() {
+  computeBoundingBox = () => {
     const {
       children,
       boundingBox: { min, max }

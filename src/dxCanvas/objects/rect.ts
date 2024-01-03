@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-23 21:36:19
+ * @LastEditTime: 2024-01-03 10:48:20
  */
 import { Vector2 } from '../math/vector2'
 import { BasicStyle } from '../style/basicStyle'
@@ -42,6 +42,7 @@ export class Rect extends Object2D {
   setPoints(points: [[number, number], [number, number]]) {
     this.points = points
     this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
   }
 
   /* 绘图 */

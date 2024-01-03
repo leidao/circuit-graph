@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-19 15:39:29
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-23 21:40:13
+ * @LastEditTime: 2024-01-03 13:23:31
  */
 import { Group } from '../objects/group'
 import { Object2D, Object2DType } from '../objects/object2D'
@@ -22,6 +22,7 @@ abstract class Helper extends Group {
   constructor(attr: HelperType = {}) {
     super()
     this.setOption(attr)
+    this.addEventListener('bound_change', this.computeBoundingBox)
   }
 
   /* 属性设置 */
@@ -55,9 +56,10 @@ abstract class Helper extends Group {
       }
       this.children.push(obj)
       this.dispatchEvent({ type: 'add_helper', target: obj })
+      obj.addEventListener('bound_change', this.computeBoundingBox)
     }
     this.sort()
-    this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
     this.dispatchEvent({
       type: 'change_helper',
       target: this
@@ -73,9 +75,10 @@ abstract class Helper extends Group {
       if (index !== -1) {
         this.children.splice(index, 1)
         this.dispatchEvent({ type: 'remove_helper', target: obj })
+        obj.removeEventListener('bound_change', this.computeBoundingBox)
       }
     }
-    this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
     this.dispatchEvent({
       type: 'change_helper',
       target: this
@@ -87,9 +90,10 @@ abstract class Helper extends Group {
   clear() {
     for (const obj of this.children) {
       this.dispatchEvent({ type: 'removed_helper', target: obj })
+      obj.removeEventListener('bound_change', this.computeBoundingBox)
     }
     this.children = []
-    this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
     this.dispatchEvent({
       type: 'change_helper',
       target: this

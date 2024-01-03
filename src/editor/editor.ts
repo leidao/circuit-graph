@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-01 17:17:18
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-23 21:12:18
+ * @LastEditTime: 2024-01-03 10:41:35
  */
 
 import _ from 'lodash'
@@ -124,10 +124,10 @@ export class Editor {
   }
   /** 鼠标移动 */
   pointermove = _.throttle((event: PointerEvent) => {
-    const { clientX, clientY } = event
-    const mouseCoordPos = this.scene.clientToCoord(clientX, clientY)
+    // const { clientX, clientY } = event
+    // const mouseCoordPos = this.scene.clientToCoord(clientX, clientY)
     this.toolManager.pointermove(event)
-    const obj = this.dynamicLayer.isPointInGraph(mouseCoordPos)
+    // const obj = this.dynamicLayer.isPointInGraph(mouseCoordPos)
     // console.log('obj', obj)
   }, 10)
   /** 鼠标松开 */

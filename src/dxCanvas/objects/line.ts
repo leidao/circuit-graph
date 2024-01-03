@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-23 21:36:24
+ * @LastEditTime: 2024-01-03 10:48:40
  */
 import { Vector2 } from '../math/vector2'
 import { BasicStyle } from '../style/basicStyle'
@@ -47,17 +47,20 @@ export class Line extends Object2D {
   setPoints(points: [number, number][]) {
     this.points = points
     this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
   }
   /** 追加点位 */
   addPoints(...rest: [number, number][]) {
     this.points.push(...rest)
     this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
   }
   /** 替换坐标 */
   replacePoints(i: number, n: number, ...rest: [number, number][]) {
     const { points } = this
     points.splice(i, n, ...rest)
     this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
   }
   /* 绘图 */
   drawShape(ctx: CanvasRenderingContext2D, externalStyle?: BasicStyle) {

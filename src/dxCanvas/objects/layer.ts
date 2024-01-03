@@ -3,12 +3,12 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-23 22:04:25
+ * @LastEditTime: 2024-01-03 14:05:22
  */
 import { Camera, dpr } from '../core/camera'
 import { sceneParam } from '../core/scene'
 import { Group } from './group'
-import { Object2DType } from './object2D'
+import { Object2D, Object2DType } from './object2D'
 export class Layer extends Group {
   // 类型
   readonly isLayer = true
@@ -66,11 +66,16 @@ export class Layer extends Group {
     autoClear && ctx.clearRect(0, 0, width, height)
     // 优化，不全量计算包围盒，只计算操作（平移、旋转、缩放）后的图形包围盒和组下修改的包围盒（add、remove、clear）
     // this.computeBoundingBox()
-
-    // 判断layer内的图形是否都在视口内
-    const viewportBounds = this.viewportBounds
-    const flag = this.isGrapBounshInViewport(this, viewportBounds)
-    if (!flag) return
+    // 是否需要判断包围盒是否在视口内
+    // 如果不需要优化，那么就不判断组的包围盒是否在视口内，只判断每一个具体图形的包围盒是否在视口内
+    const isEnableBoundingBoxOptimize =
+      this.isEnableBoundingBoxOptimize(children)
+    if (isEnableBoundingBoxOptimize) {
+      // 判断layer内的图形是否都在视口内
+      const viewportBounds = this.viewportBounds
+      const flag = this.isGraphBounshInViewport(this, viewportBounds)
+      if (!flag) return
+    }
 
     // 渲染子对象
     for (let i = 0; i < children.length; i++) {
@@ -87,25 +92,39 @@ export class Layer extends Group {
 
     ctx.restore()
   }
-  /** 获取包围盒数据 该操作会重新计算图层内所有的包围盒 */
-  computeBoundingBox() {
-    const {
-      children,
-      boundingBox: { min, max }
-    } = this
-    // 根据点计算边界
-    let minX = Infinity
-    let minY = Infinity
-    let maxX = -Infinity
-    let maxY = -Infinity
+  isEnableBoundingBoxOptimize(children: Object2D[]): boolean {
     for (const child of children) {
-      child.computeBoundingBox()
-      minX = Math.min(minX, child.boundingBox.min.x)
-      minY = Math.min(minY, child.boundingBox.min.y)
-      maxX = Math.max(maxX, child.boundingBox.max.x)
-      maxY = Math.max(maxY, child.boundingBox.max.y)
+      if (child instanceof Group) {
+        const isChildEnableBoundingBoxOptimize =
+          this.isEnableBoundingBoxOptimize(child.children)
+        if (!isChildEnableBoundingBoxOptimize) {
+          return false
+        }
+      } else if (!child.enableBoundingBoxOptimize) {
+        return false
+      }
     }
-    min.set(minX, minY)
-    max.set(maxX, maxY)
+    return true
   }
+  /** 获取包围盒数据 该操作会重新计算图层内所有的包围盒 */
+  // computeBoundingBox() {
+  //   const {
+  //     children,
+  //     boundingBox: { min, max }
+  //   } = this
+  //   // 根据点计算边界
+  //   let minX = Infinity
+  //   let minY = Infinity
+  //   let maxX = -Infinity
+  //   let maxY = -Infinity
+  //   for (const child of children) {
+  //     child.computeBoundingBox()
+  //     minX = Math.min(minX, child.boundingBox.min.x)
+  //     minY = Math.min(minY, child.boundingBox.min.y)
+  //     maxX = Math.max(maxX, child.boundingBox.max.x)
+  //     maxY = Math.max(maxY, child.boundingBox.max.y)
+  //   }
+  //   min.set(minX, minY)
+  //   max.set(maxX, maxY)
+  // }
 }

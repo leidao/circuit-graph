@@ -3,14 +3,14 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-23 21:21:25
+ * @LastEditTime: 2024-01-03 14:03:36
  */
 import { EventDispatcher } from '../core/eventDispatcher'
 import { Scene } from '../core/scene'
 import { generateUUID } from '../math/mathUtils.js'
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
-import { BasicStyle } from '../style/basicStyle'
+import { BasicStyle, BasicStyleType } from '../style/basicStyle'
 import { Group } from './group'
 import { Layer } from './layer'
 import { crtPath } from './objectUtils'
@@ -49,8 +49,10 @@ export abstract class Object2D extends EventDispatcher {
   name = ''
   /** 父级 */
   parent: Scene | Layer | Group | undefined
-  /** 是否受相机影响-只适用于Scene的children元素 */
+  /** 是否受相机影响 */
   enableCamera = true
+  /** 是否会判断包围盒是否在视口内 */
+  enableBoundingBoxOptimize = true
   /** UUID */
   uuid = generateUUID()
   /** 自定义数据 */
@@ -129,9 +131,10 @@ export abstract class Object2D extends EventDispatcher {
     return this.points
   }
   /** 样式设置 */
-  setStyle(attr: BasicStyle) {
+  setStyle(attr: BasicStyleType) {
     this.style.setOption(attr)
     this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
   }
   /* 先变换(缩放+旋转)后位移 */
   transform(ctx: CanvasRenderingContext2D) {
@@ -189,8 +192,8 @@ export abstract class Object2D extends EventDispatcher {
     }
     // 判断图形是否在视口内
     const viewportBounds = this.viewportBounds
-    const flag = this.isGrapBounshInViewport(this, viewportBounds)
-    if (!flag) return
+    const flag = this.isGraphBounshInViewport(this, viewportBounds)
+    if (!flag && this.enableBoundingBoxOptimize) return
 
     ctx.save()
     /*  矩阵变换 */
@@ -224,9 +227,11 @@ export abstract class Object2D extends EventDispatcher {
   }
 
   /** 图形的包围盒是否在视口内 */
-  isGrapBounshInViewport(obj: Object2D, viewportBounds: boundingBox) {
+  isGraphBounshInViewport(obj: Object2D, viewportBounds: boundingBox) {
     const { boundingBox } = obj
-    return this.isBoundingBoxIntersect(viewportBounds, boundingBox)
+    /* 判断boundingBox和viewportBounds是否相交 */
+    const isIntersect = this.isBoundingBoxIntersect(boundingBox, viewportBounds)
+    return isIntersect
   }
   /** 判断两个包围盒是否相交 */
   isBoundingBoxIntersect(box1: boundingBox, box2: boundingBox) {
@@ -237,7 +242,6 @@ export abstract class Object2D extends EventDispatcher {
       box1.max.y >= box2.min.y
     )
   }
-
   /* 绘制图形-接口 */
   abstract drawShape(
     ctx: CanvasRenderingContext2D,

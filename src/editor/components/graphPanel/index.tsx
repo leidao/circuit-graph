@@ -3,9 +3,9 @@
  * @Author: ldx
  * @Date: 2023-12-21 15:26:11
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-23 22:52:49
+ * @LastEditTime: 2024-01-01 14:01:28
  */
-import { Empty, InputNumber } from 'antd'
+import { ColorPicker, ColorPickerProps, Empty, InputNumber, Slider } from 'antd'
 import Big from 'big.js'
 import { useContext, useEffect, useState } from 'react'
 
@@ -50,7 +50,22 @@ const GraphPanel = () => {
       selectHelper.removeEventListener('graphOperation', changeHelper)
     }
   }, [editor])
-
+  /** 透明度值格式化 */
+  const formatter = (value?: number) => `${value}%`
+  /** 透明度改变 */
+  const globalAlphaChange = (value: number) => {
+    const selectHelper = editor?.dynamicLayer.getObjectByName(
+      'selectHelper'
+    ) as SelectHelper
+    if (!selectHelper) return
+    for (let i = 0; i < selectHelper.children.length; i++) {
+      const child = selectHelper.children[i]
+      child.setStyle({ globalAlpha: value / 100 })
+    }
+    editor?.baseLayer.render()
+  }
+  /** 颜色选择完成 */
+  const colorChangeComplete = (color: ColorPickerProps['value']) => {}
   return (
     <div className="w-100% h-100%">
       <div className="h-38px border-b-1px box-border border-#dadadc99"></div>
@@ -110,6 +125,23 @@ const GraphPanel = () => {
             />
           </div>
           <div className="h-1px bg-#ddd my-6px"></div>
+          <div className="mt-10px">
+            <span>透明度</span>
+            <Slider tooltip={{ formatter }} onChange={globalAlphaChange} />
+          </div>
+          <div>
+            <div>投影</div>
+            <div>
+              <ColorPicker
+                size="small"
+                className="m-w-130px"
+                showText
+                placement="bottomRight"
+                allowClear
+                onChangeComplete={colorChangeComplete}
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>

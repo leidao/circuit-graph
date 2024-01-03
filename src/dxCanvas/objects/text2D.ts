@@ -60,6 +60,7 @@ class Text2D extends Object2D {
   setText(text: string) {
     this.text = text
     this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
   }
   /** 获取文字内容 */
   getText(): string {

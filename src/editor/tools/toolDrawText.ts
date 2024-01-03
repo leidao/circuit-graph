@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-20 11:34:51
+ * @LastEditTime: 2024-01-03 14:02:09
  */
 import { Animation, Line, Text2D, Vector2 } from '@/dxCanvas'
 import { alignRatio, baselineRatio } from '@/dxCanvas/objects/text2D'
@@ -59,6 +59,7 @@ class ToolDrawText extends ToolBase {
         .applyMatrix3(this.text.worldMatrix)
 
       this.cursor.position.set(vertMax.x, this.downPointCoord.y)
+      this.cursor.computeBoundingBox()
       this.editor.scene.render()
     }
   }
@@ -70,6 +71,7 @@ class ToolDrawText extends ToolBase {
     this.downPointCoord = editor.scene.clientToCoord(clientX, clientY)
     if (!this.isDown) {
       this.cursor.position.copy(editor.scene.clientToCoord(clientX, clientY))
+      this.cursor.computeBoundingBox()
       this.input.style.left = `${this.downPointPixel.x}px`
       this.input.style.top = `${this.downPointPixel.y}px`
       this.animation.start()
@@ -107,7 +109,6 @@ class ToolDrawText extends ToolBase {
   /** 鼠标松开 */
   pointerup() {}
   finish = () => {
-    console.log('11123')
     this.input.value = ''
     this.animation.stop()
     this.cursor.hide()
@@ -123,6 +124,7 @@ class ToolDrawText extends ToolBase {
     // this.inactiveKeyboard()
     this.editor.domElement.removeChild(this.input)
     this.input.removeEventListener('input', this.inputChange)
+    this.cursor.hide()
   }
   /** 激活快捷键 */
   activeKeyboard() {

@@ -38,8 +38,9 @@ export class Ruler extends Object2D {
   index = Infinity
   /** 可见性 */
   config: RulerConfig
-  /** 不受相机影响 */
+  /** 受相机影响 */
   enableCamera = false
+  enableBoundingBoxOptimize = false
   name = 'Ruler'
   // 类型
   readonly isRuler = true

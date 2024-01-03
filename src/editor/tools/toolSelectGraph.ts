@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-23 22:47:31
+ * @LastEditTime: 2024-01-03 13:35:39
  */
 import Big from 'big.js'
 
@@ -47,6 +47,8 @@ class ToolSelectGraph extends ToolBase {
     }
 
     const obj = this.editor.baseLayer.isPointInGraph(this.downCoordPos)
+    // console.log('obj', obj)
+
     if (obj && !obj.userData.lock) {
       this.selectHelper.add(obj)
       // this.selectHelper.computeBoundingBox()
@@ -79,6 +81,8 @@ class ToolSelectGraph extends ToolBase {
             position.x = Number(new Big(position.x).toFixed(3))
             position.y = Number(new Big(position.y).toFixed(3))
             obj.position.copy(position)
+            obj.computeBoundingBox()
+            obj.dispatchEvent({ type: 'bound_change', target: obj })
           }
           break
         case 'scaleX':
@@ -89,13 +93,15 @@ class ToolSelectGraph extends ToolBase {
             const num =
               delta.x > 0 ? delta.x + width : Math.abs(width - delta.x)
             obj.scale.set(num / width, 1)
+            obj.computeBoundingBox()
+            obj.dispatchEvent({ type: 'bound_change', target: obj })
           }
           break
 
         default:
           break
       }
-      this.editor.scene.computeBoundingBox()
+      // this.editor.scene.computeBoundingBox()
       this.selectHelper.dispatchEvent({
         type: 'graphOperation',
         target: this.selectHelper

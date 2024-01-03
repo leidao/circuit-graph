@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-23 21:35:14
+ * @LastEditTime: 2024-01-03 10:48:10
  */
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
@@ -53,17 +53,20 @@ export class Shape extends Object2D {
   setPoints(points: [number, number][]) {
     this.points = points
     this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
   }
   /** 追加点位 */
   addPoints(points: [number, number][]) {
     this.points = this.points.concat(points)
     this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
   }
   /** 替换最后一个坐标 */
   replacePoint(point: [number, number]) {
     const { points } = this
     points.splice(points.length - 1, 1, point)
     this.computeBoundingBox()
+    this.dispatchEvent({ type: 'bound_change', target: this })
   }
   /* 绘图 */
   drawShape(ctx: CanvasRenderingContext2D, externalStyle?: BasicStyle) {
