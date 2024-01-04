@@ -2,6 +2,15 @@
   "name": "circuit-graph",
   "private": true,
   "version": "1.0.0",
+  "author": {
+    "name": "ldx",
+    "email": "18015816566@163.com",
+    "url": "https://github.com/leidao"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leidao/circuit-graph.git"
+  },
   "scripts": {
     "serve": "vite",
     "build": "vite build",
@@ -102,5 +111,14 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
-  }
+  },
+  "keywords": [
+    "react",
+    "canvas",
+    "editor",
+    "antd",
+    "ts",
+    "typescript"
+  ],
+  "license": "MIT"
 }
