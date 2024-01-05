@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-03 13:35:39
+ * @LastEditTime: 2024-01-05 15:46:41
  */
 import Big from 'big.js'
 
@@ -34,6 +34,7 @@ class ToolSelectGraph extends ToolBase {
   /** 鼠标按下 */
   pointerdown(event: PointerEvent) {
     const { clientX, clientY } = event
+
     this.downCoordPos = this.editor.scene.clientToCoord(clientX, clientY)
     this.mouseCoordPos = this.downCoordPos.clone()
     // 判断鼠标是否在包围盒里
@@ -71,10 +72,10 @@ class ToolSelectGraph extends ToolBase {
     if (this.isDown) {
       // 下面是平移、旋转、缩放的操作
       console.log('this.cursorState', this.cursorState)
-      const delta = mouseCoordPos.clone().sub(this.mouseCoordPos)
 
       switch (this.cursorState) {
-        case 'move':
+        case 'move': {
+          const delta = mouseCoordPos.clone().sub(this.mouseCoordPos)
           for (const obj of this.selectHelper.children) {
             if (obj.userData.lock) continue
             const position = obj.position.clone().add(delta)
@@ -85,7 +86,10 @@ class ToolSelectGraph extends ToolBase {
             obj.dispatchEvent({ type: 'bound_change', target: obj })
           }
           break
-        case 'scaleX':
+        }
+
+        case 'scaleX': {
+          const delta = mouseCoordPos.clone().sub(this.downCoordPos)
           for (const obj of this.selectHelper.children) {
             if (obj.userData.lock) continue
             const { min, max } = obj.boundingBox
@@ -97,13 +101,14 @@ class ToolSelectGraph extends ToolBase {
             obj.dispatchEvent({ type: 'bound_change', target: obj })
           }
           break
+        }
 
         default:
           break
       }
       // this.editor.scene.computeBoundingBox()
       this.selectHelper.dispatchEvent({
-        type: 'graphOperation',
+        type: 'graph_operation',
         target: this.selectHelper
       })
       // 鼠标样式同步更新位置
@@ -144,7 +149,7 @@ class ToolSelectGraph extends ToolBase {
     if (upCoordPos.equals(this.downCoordPos)) {
       !this.isShift && this.selectHelper.clear()
     }
-    if (obj) {
+    if (obj && event.target instanceof HTMLCanvasElement) {
       this.selectHelper.add(obj)
     } else {
       this.editor.cursorManager.setCursor('default')

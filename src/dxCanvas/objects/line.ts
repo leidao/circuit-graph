@@ -3,8 +3,9 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-03 10:48:40
+ * @LastEditTime: 2024-01-05 09:14:28
  */
+import { dpr } from '../core/camera'
 import { Vector2 } from '../math/vector2'
 import { BasicStyle } from '../style/basicStyle'
 import { StandStyle, StandStyleType } from '../style/standStyle'
@@ -103,19 +104,21 @@ export class Line extends Object2D {
     const scene = this.getScene()
     if (!scene) return
     const zoom = scene.camera.zoom
+    const len = (this.style.lineWidth * zoom) / 2 / dpr
+    const pickingLen = pickingBuffer * zoom
     if (minX !== Infinity && minY !== Infinity) {
       const minPixel = scene.coordToCanvas(min)
       const minCoord = scene.canvasToCoord(
-        minPixel.x - pickingBuffer * zoom,
-        minPixel.y - pickingBuffer * zoom
+        minPixel.x - pickingLen - len,
+        minPixel.y - pickingLen - len
       )
       min.copy(minCoord)
     }
     if (maxX !== Infinity && maxY !== Infinity) {
       const maxPixel = scene.coordToCanvas(max)
       const maxCoord = scene.canvasToCoord(
-        maxPixel.x + pickingBuffer * zoom,
-        maxPixel.y + pickingBuffer * zoom
+        maxPixel.x + pickingLen + len,
+        maxPixel.y + pickingLen + len
       )
       max.copy(maxCoord)
     }
@@ -129,15 +132,13 @@ export class Line extends Object2D {
       const scene = this.getScene()
       if (!scene) return false
       // 计算线宽，包围盒计算时需要考虑线宽
-      const len = this.style.lineWidth * scene.camera.zoom
-
-      for (let i = 0; i < points.length - 1; i++) {
-        const p1 = new Vector2(points[i][0], points[i][1]).applyMatrix3(
-          this.worldMatrix
-        )
-        const p2 = new Vector2(points[i + 1][0], points[i + 1][1]).applyMatrix3(
-          this.worldMatrix
-        )
+      const len = (this.style.lineWidth * scene.camera.zoom) / 2 / dpr
+      const expandPoint = points.map(([x, y]) => {
+        return new Vector2(x, y).applyMatrix3(this.worldMatrix)
+      })
+      for (let i = 0; i < expandPoint.length - 1; i++) {
+        const p1 = expandPoint[i]
+        const p2 = expandPoint[i + 1]
         // 这里转成像素来判断，鼠标范围更精确
         const distance = calculateDistanceToLine(
           scene.coordToCanvas(point),

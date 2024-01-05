@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-03 14:03:36
+ * @LastEditTime: 2024-01-04 21:35:34
  */
 import { EventDispatcher } from '../core/eventDispatcher'
 import { Scene } from '../core/scene'
@@ -49,6 +49,8 @@ export abstract class Object2D extends EventDispatcher {
   name = ''
   /** 父级 */
   parent: Scene | Layer | Group | undefined
+  /** 样式 */
+  style: BasicStyle = new BasicStyle()
   /** 是否受相机影响 */
   enableCamera = true
   /** 是否会判断包围盒是否在视口内 */

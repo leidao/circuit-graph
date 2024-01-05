@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-01 17:17:18
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-03 10:41:35
+ * @LastEditTime: 2024-01-05 15:47:02
  */
 
 import _ from 'lodash'
@@ -11,10 +11,12 @@ import _ from 'lodash'
 import {
   HoverHelper,
   Img,
+  Line,
   OrbitControler,
   Rect,
   Scene,
   SelectHelper,
+  Shape,
   Vector2
 } from '@/dxCanvas'
 import { Layer } from '@/dxCanvas/objects/layer'
@@ -86,6 +88,29 @@ export class Editor {
     this.orbitControler.addEventListener('change', () => {
       this.scene.render()
     })
+
+    for (let i = 0; i < 1000; i++) {
+      const rect = new Shape({
+        points: [
+          [-50, -50],
+          [50, -50],
+          [50, 50],
+          [-50, 50]
+        ],
+        position: new Vector2(i * 20 * Math.random(), i * 20 * Math.random()),
+        style: {
+          fillStyle: 'red',
+          // strokeStyle: '#000000',
+          // lineWidth: 10,
+          shadowColor: '#00ff00',
+          shadowBlur: 100,
+          shadowOffsetX: 14,
+          shadowOffsetY: 18
+          // lineWidth: 20
+        }
+      })
+      this.baseLayer.add(rect)
+    }
 
     this.scene.render()
     // tool管理

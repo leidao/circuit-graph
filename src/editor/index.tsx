@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2022-04-06 19:34:55
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-22 22:39:10
+ * @LastEditTime: 2024-01-04 21:47:44
  */
 import { useEffect, useRef, useState } from 'react'
 
@@ -53,7 +53,7 @@ const Home = () => {
             {/* <canvas  className="w-100% h-100%"></canvas> */}
           </div>
         </div>
-        <div className="w-240px h-100% border-l-1px border-#dadadc99">
+        <div className="w-280px h-100% border-l-1px border-#dadadc99">
           <GraphPanel></GraphPanel>
         </div>
       </div>

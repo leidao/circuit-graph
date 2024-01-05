@@ -3,8 +3,9 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-03 10:48:20
+ * @LastEditTime: 2024-01-04 22:08:07
  */
+import { dpr } from '../core/camera'
 import { Vector2 } from '../math/vector2'
 import { BasicStyle } from '../style/basicStyle'
 import { StandStyle, StandStyleType } from '../style/standStyle'
@@ -54,8 +55,16 @@ export class Rect extends Object2D {
     externalStyle && externalStyle.apply(ctx)
     // 绘制图像
     ctx.beginPath()
-    ctx.fillRect(points[0][0], points[0][1], points[1][0], points[1][1])
-
+    // 绘图
+    for (const method of style.drawOrder) {
+      style[`${method}Style`] &&
+        ctx[`${method}Rect`](
+          points[0][0],
+          points[0][1],
+          points[1][0],
+          points[1][1]
+        )
+    }
     // ctx.stroke()
   }
   /** 获取包围盒数据 */
@@ -66,6 +75,22 @@ export class Rect extends Object2D {
     } = this
     min.copy(new Vector2(...points[0]).applyMatrix3(this.worldMatrix))
     max.copy(new Vector2(...points[1]).applyMatrix3(this.worldMatrix))
+    const scene = this.getScene()
+    if (!scene) return
+    const zoom = scene.camera.zoom
+    const len = (this.style.lineWidth * zoom) / 2 / dpr
+    console.log('len', len, zoom)
+
+    if (min.x !== Infinity && min.y !== Infinity) {
+      const minPixel = scene.coordToCanvas(min)
+      const minCoord = scene.canvasToCoord(minPixel.x - len, minPixel.y - len)
+      min.copy(minCoord)
+    }
+    if (max.x !== Infinity && max.y !== Infinity) {
+      const maxPixel = scene.coordToCanvas(max)
+      const maxCoord = scene.canvasToCoord(maxPixel.x + len, maxPixel.y + len)
+      max.copy(maxCoord)
+    }
   }
   /** 点位是否在图形中 */
   isPointInGraph(point: Vector2): Rect | false {

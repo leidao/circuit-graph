@@ -3,14 +3,18 @@
  * @Author: ldx
  * @Date: 2023-12-21 15:26:11
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-01 14:01:28
+ * @LastEditTime: 2024-01-05 15:06:00
  */
-import { ColorPicker, ColorPickerProps, Empty, InputNumber, Slider } from 'antd'
+import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
+import { ColorPickerProps, Empty, InputNumber, Slider } from 'antd'
 import Big from 'big.js'
 import { useContext, useEffect, useState } from 'react'
 
 import { Object2D, SelectHelper } from '@/dxCanvas'
+import { BasicStyle } from '@/dxCanvas/style/basicStyle'
 import EditorContext from '@/editor/context'
+
+import Shadow from './shadow'
 const GraphPanel = () => {
   const editor = useContext(EditorContext)
   const [selectGraph, setSetlectGraph] = useState<Object2D>()
@@ -19,6 +23,9 @@ const GraphPanel = () => {
   const [w, setW] = useState(0)
   const [h, setH] = useState(0)
   const [r, setR] = useState(0)
+  const [style, setStyle] = useState<BasicStyle>()
+  const [alpha, setAlpha] = useState(1)
+  const [shadow, setShadow] = useState(false)
   useEffect(() => {
     if (!editor) return
     const selectHelper = editor.dynamicLayer.getObjectByName(
@@ -41,31 +48,38 @@ const GraphPanel = () => {
         setW(Number(new Big(max.x).minus(min.x).toFixed(3)))
         setH(Number(new Big(max.y).minus(min.y).toFixed(3)))
         setR(obj.rotate)
+        setAlpha(
+          typeof obj.style.globalAlpha === 'undefined'
+            ? 1
+            : obj.style.globalAlpha
+        )
+        setStyle(obj.style)
+        setShadow(!!obj.style.shadowColor)
       }
     }
     selectHelper.addEventListener('change_helper', changeHelper)
-    selectHelper.addEventListener('graphOperation', changeHelper)
+    selectHelper.addEventListener('graph_operation', changeHelper)
     return () => {
       selectHelper.removeEventListener('change_helper', changeHelper)
-      selectHelper.removeEventListener('graphOperation', changeHelper)
+      selectHelper.removeEventListener('graph_operation', changeHelper)
     }
   }, [editor])
   /** 透明度值格式化 */
-  const formatter = (value?: number) => `${value}%`
+  const formatter = (value = 0) => `${parseInt(value * 100 + '')}%`
   /** 透明度改变 */
   const globalAlphaChange = (value: number) => {
     const selectHelper = editor?.dynamicLayer.getObjectByName(
       'selectHelper'
     ) as SelectHelper
     if (!selectHelper) return
+    // const alpha = value / 100
     for (let i = 0; i < selectHelper.children.length; i++) {
       const child = selectHelper.children[i]
-      child.setStyle({ globalAlpha: value / 100 })
+      child.setStyle({ globalAlpha: value })
     }
+    setAlpha(value)
     editor?.baseLayer.render()
   }
-  /** 颜色选择完成 */
-  const colorChangeComplete = (color: ColorPickerProps['value']) => {}
   return (
     <div className="w-100% h-100%">
       <div className="h-38px border-b-1px box-border border-#dadadc99"></div>
@@ -126,22 +140,52 @@ const GraphPanel = () => {
           </div>
           <div className="h-1px bg-#ddd my-6px"></div>
           <div className="mt-10px">
-            <span>透明度</span>
-            <Slider tooltip={{ formatter }} onChange={globalAlphaChange} />
+            <div className="h-38px leading-10">透明度</div>
+            <Slider
+              value={alpha}
+              min={0}
+              max={1}
+              step={0.01}
+              tooltip={{ formatter }}
+              onChange={globalAlphaChange}
+            />
           </div>
+          <div className="h-1px bg-#ddd my-6px"></div>
           <div>
-            <div>投影</div>
-            <div>
-              <ColorPicker
-                size="small"
-                className="m-w-130px"
-                showText
-                placement="bottomRight"
-                allowClear
-                onChangeComplete={colorChangeComplete}
+            <div className="h-38px leading-10 flex items-center justify-between">
+              <span>阴影</span>
+              <PlusOutlined
+                className="cursor-pointer"
+                onClick={() => {
+                  if (!style) return
+                  style.shadowColor = '#000000'
+                  style.shadowOffsetX = 10
+                  style.shadowOffsetY = 20
+                  style.shadowBlur = 30
+                  setShadow(true)
+                  editor?.baseLayer.render()
+                }}
               />
             </div>
+            {shadow && (
+              <div className="my-10px flex items-center justify-between">
+                <Shadow style={style}></Shadow>
+                <MinusOutlined
+                  className="cursor-pointer"
+                  onClick={() => {
+                    if (!style) return
+                    style.shadowColor = undefined
+                    style.shadowBlur = 0
+                    style.shadowOffsetX = 0
+                    style.shadowOffsetY = 0
+                    setShadow(false)
+                    editor?.baseLayer.render()
+                  }}
+                />
+              </div>
+            )}
           </div>
+          <div className="h-1px bg-#ddd my-6px"></div>
         </div>
       )}
     </div>

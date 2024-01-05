@@ -3,8 +3,9 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-03 10:48:10
+ * @LastEditTime: 2024-01-05 10:33:12
  */
+import { dpr } from '../core/camera'
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
 import { BasicStyle } from '../style/basicStyle'
@@ -79,8 +80,10 @@ export class Shape extends Object2D {
     ctx.beginPath()
     const flatPoints = points.flat()
     crtPath(ctx, flatPoints, true)
-    ctx.fill()
-    ctx.stroke()
+    // 绘图
+    for (const method of style.drawOrder) {
+      style[`${method}Style`] && ctx[`${method}`]()
+    }
   }
   /** 获取包围盒数据 */
   computeBoundingBox() {
@@ -102,6 +105,21 @@ export class Shape extends Object2D {
     }
     min.copy(new Vector2(minX, minY).applyMatrix3(this.worldMatrix))
     max.copy(new Vector2(maxX, maxY).applyMatrix3(this.worldMatrix))
+
+    // const scene = this.getScene()
+    // if (!scene) return
+    // const zoom = scene.camera.zoom
+    // const len = (this.style.lineWidth * zoom) / 2 / dpr
+    // if (minX !== Infinity && minY !== Infinity) {
+    //   const minPixel = scene.coordToCanvas(min)
+    //   const minCoord = scene.canvasToCoord(minPixel.x - len, minPixel.y - len)
+    //   min.copy(minCoord)
+    // }
+    // if (maxX !== Infinity && maxY !== Infinity) {
+    //   const maxPixel = scene.coordToCanvas(max)
+    //   const maxCoord = scene.canvasToCoord(maxPixel.x + len, maxPixel.y + len)
+    //   max.copy(maxCoord)
+    // }
   }
   /** 点位是否在图形中 */
   isPointInGraph(point: Vector2): Shape | false {
@@ -110,11 +128,12 @@ export class Shape extends Object2D {
     if (isPointInBounds) {
       const { points } = this
       let wn = 0 // 绕组数
-
-      for (let i = 0; i < points.length; i++) {
-        const p1 = points[i]
-        const p2 = points[(i + 1) % points.length]
-
+      const expandPoint = points.map(([x, y]) => {
+        return new Vector2(x, y).applyMatrix3(this.worldMatrix).toArray()
+      })
+      for (let i = 0; i < expandPoint.length; i++) {
+        const p1 = expandPoint[i]
+        const p2 = expandPoint[(i + 1) % expandPoint.length]
         if (p1[1] <= point.y) {
           if (p2[1] > point.y && this.isLeft(p1, p2, point) > 0) {
             wn++
