@@ -3,8 +3,10 @@
  * @Author: ldx
  * @Date: 2023-11-19 16:05:57
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-20 10:31:21
+ * @LastEditTime: 2024-01-05 17:31:25
  */
+import { isFunction } from 'lodash'
+
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
 /** 根据矩阵绘制路径 */
@@ -114,4 +116,31 @@ export const calculateDistanceToLine = (
   const dx = x - xx
   const dy = y - yy
   return Math.sqrt(dx * dx + dy * dy)
+}
+
+const callbacks: (() => void)[] = []
+function flushCallbacks() {
+  callbacks.forEach((cb) => cb())
+}
+export function nextTick(cb: () => void) {
+  callbacks.push(cb)
+  const timerFunc = () => {
+    flushCallbacks()
+  }
+  if (Promise) {
+    return Promise.resolve().then(timerFunc)
+  }
+  if (MutationObserver) {
+    //h5api
+    const mutation = new MutationObserver(timerFunc)
+    const node = document.createTextNode(1)
+    mutation.observe(node, { characterData: true })
+    node.textContent = '2'
+    return
+  }
+  if (setImmediate) {
+    setImmediate(timerFunc)
+    return
+  }
+  setTimeout(timerFunc, 0)
 }

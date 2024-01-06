@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-03 14:05:22
+ * @LastEditTime: 2024-01-05 16:54:56
  */
 import { Camera, dpr } from '../core/camera'
 import { sceneParam } from '../core/scene'
@@ -76,10 +76,14 @@ export class Layer extends Group {
       const flag = this.isGraphBounshInViewport(this, viewportBounds)
       if (!flag) return
     }
-
+    const viewportBounds = this.viewportBounds
     // 渲染子对象
     for (let i = 0; i < children.length; i++) {
       const obj = children[i]
+      // 判断图形是否在视口内
+      // const viewportBounds = this.viewportBounds
+      const flag = obj.isGraphBounshInViewport(obj, viewportBounds)
+      if (!flag && obj.enableBoundingBoxOptimize) continue
       ctx.save()
       // 视图投影矩阵
       obj.enableCamera && camera.transformInvert(ctx)

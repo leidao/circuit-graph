@@ -3,10 +3,11 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-03 13:23:05
+ * @LastEditTime: 2024-01-05 17:39:07
  */
 import { Vector2 } from '../math/vector2'
 import { Object2D, Object2DType } from './object2D'
+import { nextTick } from './objectUtils'
 
 export class Group extends Object2D {
   // 子集
@@ -39,8 +40,12 @@ export class Group extends Object2D {
       obj.addEventListener('bound_change', this.computeBoundingBox)
     }
     this.sort()
+
+    // nextTick(() => {
     this.dispatchEvent({ type: 'bound_change', target: this })
     this.dispatchEvent({ type: 'change', target: this })
+    // })
+
     return this
   }
 

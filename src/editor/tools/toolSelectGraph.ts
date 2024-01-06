@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-05 15:46:41
+ * @LastEditTime: 2024-01-05 17:05:02
  */
 import Big from 'big.js'
 
@@ -75,6 +75,7 @@ class ToolSelectGraph extends ToolBase {
 
       switch (this.cursorState) {
         case 'move': {
+          // this.editor.cursorManager.setCursor('move')
           const delta = mouseCoordPos.clone().sub(this.mouseCoordPos)
           for (const obj of this.selectHelper.children) {
             if (obj.userData.lock) continue

@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-01 17:17:18
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-05 15:47:02
+ * @LastEditTime: 2024-01-05 18:06:57
  */
 
 import _ from 'lodash'
@@ -99,13 +99,13 @@ export class Editor {
         ],
         position: new Vector2(i * 20 * Math.random(), i * 20 * Math.random()),
         style: {
-          fillStyle: 'red',
+          fillStyle: 'red'
           // strokeStyle: '#000000',
           // lineWidth: 10,
-          shadowColor: '#00ff00',
-          shadowBlur: 100,
-          shadowOffsetX: 14,
-          shadowOffsetY: 18
+          // shadowColor: '#00ff00',
+          // shadowBlur: 100,
+          // shadowOffsetX: 14,
+          // shadowOffsetY: 18
           // lineWidth: 20
         }
       })
@@ -122,6 +122,32 @@ export class Editor {
 
     // 快捷键注册
     this.activeKeyboard()
+
+    setTimeout(() => {
+      for (let i = 0; i < 100; i++) {
+        const rect = new Shape({
+          points: [
+            [-50, -50],
+            [50, -50],
+            [50, 50],
+            [-50, 50]
+          ],
+          position: new Vector2(i * 20 * Math.random(), i * 20 * Math.random()),
+          style: {
+            fillStyle: 'red',
+            // strokeStyle: '#000000',
+            // lineWidth: 10,
+            shadowColor: '#00ff00',
+            shadowBlur: 100,
+            shadowOffsetX: 14,
+            shadowOffsetY: 18
+            // lineWidth: 20
+          }
+        })
+        this.baseLayer.add(rect)
+      }
+      this.scene.render()
+    }, 0)
   }
 
   /** 缩放 */
@@ -241,10 +267,12 @@ export class Editor {
       'hoverHelper'
     ) as HoverHelper
     if (!selectHelper || !hoverHelper) return
-    for (const obj of selectHelper.children) {
-      hoverHelper.remove(obj)
-      obj.remove()
-    }
+    // for (const obj of selectHelper.children) {
+    //   hoverHelper.remove(obj)
+    //   obj.remove()
+    // }
+    hoverHelper.remove(...selectHelper.children)
+    this.baseLayer.remove(...selectHelper.children)
     selectHelper.clear()
     this.cursorManager.setCursor('default')
     this.scene.render()
@@ -255,9 +283,10 @@ export class Editor {
       'selectHelper'
     ) as SelectHelper
     if (!selectHelper) return
-    for (const obj of this.baseLayer.children) {
-      selectHelper.add(obj)
-    }
+    // for (const obj of this.baseLayer.children) {
+
+    // }
+    selectHelper.add(...this.baseLayer.children)
     this.scene.render()
   }
   /** 显示全部/适应画布 */
@@ -294,7 +323,7 @@ export class Editor {
       layerMax === vert.x ? viewportWidth - 60 : viewportHeight - 60
     const scale = canvasMax / layerMax
 
-    const zoom = Math.min(9, scale)
+    const zoom = Math.min(8, scale)
 
     this.scene.camera.zoom = zoom
     this.orbitControler.setZoom()
@@ -335,10 +364,10 @@ export class Editor {
     // 图层的宽度和高度取最大值，画布则取和图层队友的宽度或者高度
     // 这里用像素的大小去计算比例
     const canvasMax =
-      layerMax === vert.x ? viewportWidth - 60 : viewportHeight - 60
+      layerMax === vert.x ? viewportWidth - 60 : viewportHeight - 260
     const scale = canvasMax / layerMax
 
-    const zoom = Math.min(9, scale)
+    const zoom = Math.min(8, scale)
 
     this.scene.camera.zoom = zoom
     this.orbitControler.setZoom()
