@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-04 22:08:07
+ * @LastEditTime: 2024-01-07 23:58:20
  */
 import { dpr } from '../core/camera'
 import { Vector2 } from '../math/vector2'
@@ -91,6 +91,12 @@ export class Rect extends Object2D {
       const maxCoord = scene.canvasToCoord(maxPixel.x + len, maxPixel.y + len)
       max.copy(maxCoord)
     }
+    this.boundingBox._path = [
+      min,
+      new Vector2(points[1][0], points[0][1]).applyMatrix3(this.worldMatrix),
+      max,
+      new Vector2(points[0][0], points[1][1]).applyMatrix3(this.worldMatrix)
+    ]
   }
   /** 点位是否在图形中 */
   isPointInGraph(point: Vector2): Rect | false {

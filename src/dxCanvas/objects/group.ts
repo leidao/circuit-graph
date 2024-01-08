@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-05 17:39:07
+ * @LastEditTime: 2024-01-08 10:34:34
  */
 import { Vector2 } from '../math/vector2'
 import { Object2D, Object2DType } from './object2D'
@@ -174,13 +174,25 @@ export class Group extends Object2D {
     let maxX = -Infinity
     let maxY = -Infinity
     for (const child of children) {
-      minX = Math.min(minX, child.boundingBox.min.x)
-      minY = Math.min(minY, child.boundingBox.min.y)
-      maxX = Math.max(maxX, child.boundingBox.max.x)
-      maxY = Math.max(maxY, child.boundingBox.max.y)
+      for (const path of child.boundingBox._path) {
+        minX = Math.min(minX, path.x)
+        minY = Math.min(minY, path.y)
+        maxX = Math.max(maxX, path.x)
+        maxY = Math.max(maxY, path.y)
+      }
     }
     min.set(minX, minY)
     max.set(maxX, maxY)
+    min.applyMatrix3(this.worldMatrix)
+    max.applyMatrix3(this.worldMatrix)
+
+    this.boundingBox._path = [
+      min,
+      new Vector2(maxX, minY).applyMatrix3(this.worldMatrix),
+      max,
+      new Vector2(minX, maxY).applyMatrix3(this.worldMatrix)
+    ]
+    // console.log('group', this.boundingBox._path)
   }
   /** 点位是否在图形中 */
   isPointInGraph(point: Vector2): Object2D | false {

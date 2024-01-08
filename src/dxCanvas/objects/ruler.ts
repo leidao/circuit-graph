@@ -2,7 +2,7 @@
 import { dpr } from '../core/camera'
 import { Vector2 } from '../math/vector2'
 import { Object2D } from './object2D'
-import { getClosestTimesVal, nearestPixelVal } from './objectUtils'
+import { getClosestTimesVal, isLeft, nearestPixelVal } from './objectUtils'
 export const HALF_PI = Math.PI / 2
 const getStepByZoom = (zoom: number) => {
   /**
@@ -211,11 +211,11 @@ export class Ruler extends Object2D {
         const p2 = points[(i + 1) % points.length]
 
         if (p1[1] <= coord.y) {
-          if (p2[1] > coord.y && this.isLeft(p1, p2, coord) > 0) {
+          if (p2[1] > coord.y && isLeft(p1, p2, coord.toArray()) > 0) {
             wn++
           }
         } else {
-          if (p2[1] <= coord.y && this.isLeft(p1, p2, coord) < 0) {
+          if (p2[1] <= coord.y && isLeft(p1, p2, coord.toArray()) < 0) {
             wn--
           }
         }
@@ -225,13 +225,7 @@ export class Ruler extends Object2D {
     }
     return false
   }
-  private isLeft(
-    p0: [number, number],
-    p1: [number, number],
-    p2: Vector2
-  ): number {
-    return (p1[0] - p0[0]) * (p2.y - p0[1]) - (p2.x - p0[0]) * (p1[1] - p0[1])
-  }
+
   computeBoundingBox() {
     const {
       boundingBox: { min, max }
@@ -243,5 +237,11 @@ export class Ruler extends Object2D {
     const viewportmax = scene.canvasToCoord(viewportWidth, viewportHeight)
     min.copy(viewportMin)
     max.copy(viewportmax)
+    this.boundingBox._path = [
+      min,
+      new Vector2(viewportmax.x, viewportMin.y).applyMatrix3(this.worldMatrix),
+      max,
+      new Vector2(viewportMin.x, viewportmax.y).applyMatrix3(this.worldMatrix)
+    ]
   }
 }

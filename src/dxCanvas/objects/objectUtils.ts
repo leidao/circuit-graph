@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-19 16:05:57
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-05 17:31:25
+ * @LastEditTime: 2024-01-08 10:00:02
  */
 import { isFunction } from 'lodash'
 
@@ -143,4 +143,12 @@ export function nextTick(cb: () => void) {
     return
   }
   setTimeout(timerFunc, 0)
+}
+
+export function isLeft(
+  p0: [number, number],
+  p1: [number, number],
+  p2: [number, number]
+): number {
+  return (p1[0] - p0[0]) * (p2[1] - p0[1]) - (p2[0] - p0[0]) * (p1[1] - p0[1])
 }

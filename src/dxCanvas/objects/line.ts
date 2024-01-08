@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-05 09:14:28
+ * @LastEditTime: 2024-01-07 23:56:26
  */
 import { dpr } from '../core/camera'
 import { Vector2 } from '../math/vector2'
@@ -122,6 +122,12 @@ export class Line extends Object2D {
       )
       max.copy(maxCoord)
     }
+    this.boundingBox._path = [
+      min,
+      new Vector2(maxX, minY).applyMatrix3(this.worldMatrix),
+      max,
+      new Vector2(minX, maxY).applyMatrix3(this.worldMatrix)
+    ]
   }
 
   /** 点位是否在图形中 */

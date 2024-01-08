@@ -156,6 +156,12 @@ class Text2D extends Object2D {
       maxPixel.y + pickingBuffer * zoom
     )
     max.copy(maxCoord)
+    this.boundingBox._path = [
+      min,
+      new Vector2(vertMax.x, vertMin.y).applyMatrix3(this.worldMatrix),
+      max,
+      new Vector2(vertMin.x, vertMax.y).applyMatrix3(this.worldMatrix)
+    ]
   }
   /** 点位是否在图形中 */
   isPointInGraph(point: Vector2): Text2D | false {

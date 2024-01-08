@@ -3,11 +3,17 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-05 17:05:02
+ * @LastEditTime: 2024-01-08 10:46:36
  */
 import Big from 'big.js'
 
-import { HoverHelper, SelectHelper, Vector2 } from '@/dxCanvas'
+import {
+  HoverHelper,
+  Object2D,
+  radToDeg,
+  SelectHelper,
+  Vector2
+} from '@/dxCanvas'
 import { State } from '@/dxCanvas/helpers/selectHelper'
 
 import { Editor } from '../editor'
@@ -31,6 +37,21 @@ class ToolSelectGraph extends ToolBase {
     editor.dynamicLayer.add(this.hoverHelper)
     editor.dynamicLayer.add(this.selectHelper)
   }
+  /* 获取图案本地的缩放量 */
+  getLocalScale(obj: Object2D, mouseCoordPos: Vector2) {
+    const { rotate } = obj
+    const { min, max } = obj.boundingBox
+    const orign = max.clone().add(min).multiplyScalar(0.5)
+
+    const rotateInvert = -rotate
+
+    return mouseCoordPos
+      .clone()
+      .sub(orign)
+      .rotate(rotateInvert)
+      .divide(this.mouseCoordPos.clone().sub(orign).rotate(rotateInvert))
+  }
+
   /** 鼠标按下 */
   pointerdown(event: PointerEvent) {
     const { clientX, clientY } = event
@@ -71,7 +92,7 @@ class ToolSelectGraph extends ToolBase {
     const mouseCoordPos = this.editor.scene.clientToCoord(clientX, clientY)
     if (this.isDown) {
       // 下面是平移、旋转、缩放的操作
-      console.log('this.cursorState', this.cursorState)
+      // console.log('this.cursorState', this.cursorState)
 
       switch (this.cursorState) {
         case 'move': {
@@ -90,14 +111,55 @@ class ToolSelectGraph extends ToolBase {
         }
 
         case 'scaleX': {
-          const delta = mouseCoordPos.clone().sub(this.downCoordPos)
+          for (const obj of this.selectHelper.children) {
+            if (obj.userData.lock) continue
+            const scale = obj.scale
+              .clone()
+              .multiply(this.getLocalScale(obj, mouseCoordPos))
+            obj.scale.set(Math.abs(scale.x), obj.scale.y)
+            obj.computeBoundingBox()
+            obj.dispatchEvent({ type: 'bound_change', target: obj })
+          }
+          break
+        }
+        case 'scaleY': {
+          for (const obj of this.selectHelper.children) {
+            if (obj.userData.lock) continue
+
+            const scale = obj.scale
+              .clone()
+              .multiply(this.getLocalScale(obj, mouseCoordPos))
+            obj.scale.set(obj.scale.x, Math.abs(scale.y))
+            obj.computeBoundingBox()
+            obj.dispatchEvent({ type: 'bound_change', target: obj })
+          }
+          break
+        }
+        case 'scale': {
+          for (const obj of this.selectHelper.children) {
+            if (obj.userData.lock) continue
+
+            const scale = obj.scale
+              .clone()
+              .multiply(this.getLocalScale(obj, mouseCoordPos))
+            obj.scale.copy(scale)
+            obj.computeBoundingBox()
+            obj.dispatchEvent({ type: 'bound_change', target: obj })
+          }
+          break
+        }
+        case 'rotate': {
           for (const obj of this.selectHelper.children) {
             if (obj.userData.lock) continue
             const { min, max } = obj.boundingBox
-            const width = max.x - min.x
-            const num =
-              delta.x > 0 ? delta.x + width : Math.abs(width - delta.x)
-            obj.scale.set(num / width, 1)
+            const orign = max.clone().add(min).multiplyScalar(0.5)
+            const l1 = this.mouseCoordPos.clone().sub(orign).normalize()
+            const l2 = mouseCoordPos.clone().sub(orign).normalize()
+            // console.log('l1.dot(l2)', l1.cross(l2))
+            const direction = l1.cross(l2)
+            const rad = Math.acos(l1.dot(l2)) * (direction > 0 ? 1 : -1)
+            obj.rotate = (obj.rotate + rad) % (Math.PI * 2)
+            // console.log('angle', rad, radToDeg(obj.rotate))
             obj.computeBoundingBox()
             obj.dispatchEvent({ type: 'bound_change', target: obj })
           }

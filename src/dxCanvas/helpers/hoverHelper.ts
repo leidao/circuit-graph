@@ -3,9 +3,10 @@
  * @Author: ldx
  * @Date: 2023-12-19 15:39:29
  * @LastEditors: ldx
- * @LastEditTime: 2023-12-20 16:22:32
+ * @LastEditTime: 2024-01-07 23:35:55
  */
 import { crtPath } from '../objects/objectUtils'
+import { StandStyle } from '../style/standStyle'
 import Helper, { HelperType } from './helper'
 
 class HoverHelper extends Helper {
@@ -27,17 +28,17 @@ class HoverHelper extends Helper {
       ctx.save()
       if (obj.isImg) {
         const {
-          boundingBox: {
-            min: { x: x0, y: y0 },
-            max: { x: x1, y: y1 }
-          }
+          boundingBox: { _path }
         } = obj
         style.apply(ctx)
         ctx.lineWidth = 1 / zoom
-        crtPath(ctx, [x0, y0, x1, y0, x1, y1, x0, y1], true)
+        const path = _path.map((vector) => vector.toArray()).flat()
+        console.log('path', path, _path)
+
+        crtPath(ctx, path, true)
         ctx.stroke()
       } else if (obj.isLineSegments) {
-        style.lineWidth = obj.style.lineWidth + 3
+        style.lineWidth = (obj.style as StandStyle).lineWidth + 3
         obj.draw(ctx, style)
       } else {
         obj.draw(ctx, style)

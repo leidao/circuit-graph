@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-05 10:33:12
+ * @LastEditTime: 2024-01-08 09:06:07
  */
 import { dpr } from '../core/camera'
 import { Matrix3 } from '../math/matrix3'
@@ -105,6 +105,12 @@ export class Shape extends Object2D {
     }
     min.copy(new Vector2(minX, minY).applyMatrix3(this.worldMatrix))
     max.copy(new Vector2(maxX, maxY).applyMatrix3(this.worldMatrix))
+    this.boundingBox._path = [
+      min,
+      new Vector2(maxX, minY).applyMatrix3(this.worldMatrix),
+      max,
+      new Vector2(minX, maxY).applyMatrix3(this.worldMatrix)
+    ]
 
     // const scene = this.getScene()
     // if (!scene) return

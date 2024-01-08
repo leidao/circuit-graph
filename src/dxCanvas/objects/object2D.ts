@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:19:56
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-04 21:35:34
+ * @LastEditTime: 2024-01-08 10:46:05
  */
 import { EventDispatcher } from '../core/eventDispatcher'
 import { Scene } from '../core/scene'
@@ -13,7 +13,8 @@ import { Vector2 } from '../math/vector2'
 import { BasicStyle, BasicStyleType } from '../style/basicStyle'
 import { Group } from './group'
 import { Layer } from './layer'
-import { crtPath } from './objectUtils'
+import { crtPath, isLeft } from './objectUtils'
+import { Shape } from './shape'
 
 export type Object2DType = {
   position?: Vector2
@@ -62,7 +63,8 @@ export abstract class Object2D extends EventDispatcher {
   /** 包围盒 */
   boundingBox = {
     min: new Vector2(),
-    max: new Vector2()
+    max: new Vector2(),
+    _path: [] as Vector2[]
   }
   /** 点位集合 */
   protected points: [number, number][] = []
@@ -220,29 +222,59 @@ export abstract class Object2D extends EventDispatcher {
     ctx.stroke()
   }
   /** 点位是否在包围盒 */
-  isPointInBounds({ x, y }: Vector2, boundingBox = this.boundingBox) {
-    const {
-      min: { x: x0, y: y0 },
-      max: { x: x1, y: y1 }
-    } = boundingBox
-    return x >= x0 && x <= x1 && y >= y0 && y <= y1
+  isPointInBounds({ x, y }: Vector2, path = this.boundingBox._path): boolean {
+    if (path.length === 0) return false
+    const [p0, p1, p2, p3] = path
+    const [x0, y0] = p0.toArray()
+    const [x1, y1] = p1.toArray()
+    const [x2, y2] = p2.toArray()
+    const [x3, y3] = p3.toArray()
+
+    return (
+      isLeft([x, y], [x0, y0], [x1, y1]) > 0 &&
+      isLeft([x, y], [x1, y1], [x2, y2]) > 0 &&
+      isLeft([x, y], [x2, y2], [x3, y3]) > 0 &&
+      isLeft([x, y], [x3, y3], [x0, y0]) > 0
+    )
   }
 
   /** 图形的包围盒是否在视口内 */
   isGraphBounshInViewport(obj: Object2D, viewportBounds: boundingBox) {
     const { boundingBox } = obj
     /* 判断boundingBox和viewportBounds是否相交 */
-    const isIntersect = this.isBoundingBoxIntersect(boundingBox, viewportBounds)
+    const isIntersect = this.isBoundingBoxIntersect(
+      boundingBox._path,
+      viewportBounds
+    )
     return isIntersect
   }
+
   /** 判断两个包围盒是否相交 */
-  isBoundingBoxIntersect(box1: boundingBox, box2: boundingBox) {
-    return (
-      box1.min.x <= box2.max.x &&
-      box1.max.x >= box2.min.x &&
-      box1.min.y <= box2.max.y &&
-      box1.max.y >= box2.min.y
-    )
+  isBoundingBoxIntersect(box1: Vector2[], box2: boundingBox) {
+    if (box1.length === 0) return false
+    // 获取矩形1的四个点坐标
+    const [x1, y1, x2, y2, x3, y3, x4, y4] = box1
+      .map((vector) => vector.toArray())
+      .flat()
+
+    // 获取矩形2的min和max坐标
+    const {
+      min: { x: minX2, y: minY2 },
+      max: { x: maxX2, y: maxY2 }
+    } = box2
+
+    // 在X轴上的投影是否相交
+    if (Math.max(x1, x2, x3, x4) < minX2 || Math.min(x1, x2, x3, x4) > maxX2) {
+      return false
+    }
+
+    // 在Y轴上的投影是否相交
+    if (Math.max(y1, y2, y3, y4) < minY2 || Math.min(y1, y2, y3, y4) > maxY2) {
+      return false
+    }
+
+    // 如果在X轴和Y轴上的投影都相交，则矩形相交
+    return true
   }
   /* 绘制图形-接口 */
   abstract drawShape(

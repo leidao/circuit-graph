@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-11-15 12:21:19
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-03 13:35:57
+ * @LastEditTime: 2024-01-07 23:55:18
  */
 import { Matrix3 } from '../math/matrix3'
 import { Vector2 } from '../math/vector2'
@@ -111,6 +111,12 @@ export class Img extends Object2D {
     } = this
     min.copy(new Vector2(0, 0).applyMatrix3(this.worldMatrix))
     max.copy(new Vector2(imgW, imgH).applyMatrix3(this.worldMatrix))
+    this.boundingBox._path = [
+      min,
+      new Vector2(imgW, 0).applyMatrix3(this.worldMatrix),
+      max,
+      new Vector2(0, imgH).applyMatrix3(this.worldMatrix)
+    ]
   }
   /** 点位是否在图形中 */
   isPointInGraph(point: Vector2): Img | false {

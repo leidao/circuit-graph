@@ -3,10 +3,14 @@
  * @Author: ldx
  * @Date: 2023-12-19 15:39:29
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-04 22:08:51
+ * @LastEditTime: 2024-01-08 10:12:01
  */
 import { Vector2 } from '../math/vector2'
-import { calculateDistanceToLine, crtPath } from '../objects/objectUtils'
+import {
+  calculateDistanceToLine,
+  crtPath,
+  isLeft
+} from '../objects/objectUtils'
 import Helper, { HelperType } from './helper'
 /* 鼠标状态 */
 export type State = 'scale' | 'scaleX' | 'scaleY' | 'rotate' | 'move' | null
@@ -45,7 +49,7 @@ class SelectHelper extends Helper {
   }
   /* 绘图 */
   drawShape(ctx: CanvasRenderingContext2D) {
-    const { style, children } = this
+    const { style } = this
     //样式
     // 1 / 2 / zoom = n   1 = n * zoom * 2
     const zoom = this.getScene()?.camera.zoom || 1
@@ -78,13 +82,20 @@ class SelectHelper extends Helper {
     // 包围盒
     ctx.beginPath()
     const {
-      boundingBox: {
-        min: { x: x0, y: y0 },
-        max: { x: x1, y: y1 }
-      }
+      boundingBox: { _path },
+      children
     } = this
     ctx.lineWidth = 1 / zoom
-    this.vertices = [x0, y0, x1, y0, x1, y1, x0, y1]
+    if (children.length === 1) {
+      this.vertices = children[0].boundingBox._path
+        .map((vector) => vector.toArray())
+        .flat()
+    } else {
+      this.vertices = _path.map((vector) => vector.toArray()).flat()
+    }
+    // this.vertices = [x0, y0, x1, y0, x1, y1, x0, y1]
+    // console.log('xxxx', this.vertices)
+
     crtPath(ctx, this.vertices, true)
     ctx.stroke()
 
@@ -130,17 +141,13 @@ class SelectHelper extends Helper {
     const scene = this.getScene()
     if (!scene) return null
 
-    const {
-      boundingBox: {
-        min: { x: x0, y: y0 },
-        max: { x: x1, y: y1 }
-      }
-    } = this
+    const { vertices } = this
+    const [x0, y0, x1, y1, x2, y2, x3, y3] = vertices
 
     /* x,y缩放 */
-    for (let i = 0; i < this.vertices.length; i += 2) {
-      const x = this.vertices[i]
-      const y = this.vertices[i + 1]
+    for (let i = 0; i < vertices.length; i += 2) {
+      const x = vertices[i]
+      const y = vertices[i + 1]
       if (
         scene
           .coordToCanvas(new Vector2(x, y))
@@ -156,8 +163,8 @@ class SelectHelper extends Helper {
     /* x向缩放 */
     distance = calculateDistanceToLine(
       scene.coordToCanvas(this.mousePos),
-      scene.coordToCanvas(new Vector2(x1, y0)),
-      scene.coordToCanvas(new Vector2(x1, y1))
+      scene.coordToCanvas(new Vector2(x1, y1)),
+      scene.coordToCanvas(new Vector2(x2, y2))
     )
     _bool = distance <= 4
     if (_bool) {
@@ -167,7 +174,7 @@ class SelectHelper extends Helper {
     distance = calculateDistanceToLine(
       scene.coordToCanvas(this.mousePos),
       scene.coordToCanvas(new Vector2(x0, y0)),
-      scene.coordToCanvas(new Vector2(x0, y1))
+      scene.coordToCanvas(new Vector2(x3, y3))
     )
     _bool = distance <= 4
     if (_bool) {
@@ -179,7 +186,7 @@ class SelectHelper extends Helper {
     distance = calculateDistanceToLine(
       scene.coordToCanvas(this.mousePos),
       scene.coordToCanvas(new Vector2(x0, y0)),
-      scene.coordToCanvas(new Vector2(x1, y0))
+      scene.coordToCanvas(new Vector2(x1, y1))
     )
     _bool = distance <= 4
     if (_bool) {
@@ -188,8 +195,8 @@ class SelectHelper extends Helper {
     }
     distance = calculateDistanceToLine(
       scene.coordToCanvas(this.mousePos),
-      scene.coordToCanvas(new Vector2(x0, y1)),
-      scene.coordToCanvas(new Vector2(x1, y1))
+      scene.coordToCanvas(new Vector2(x2, y2)),
+      scene.coordToCanvas(new Vector2(x3, y3))
     )
     _bool = distance <= 4
     if (_bool) {
@@ -198,11 +205,12 @@ class SelectHelper extends Helper {
     }
 
     /* 移动 */
+    const [x, y] = this.mousePos.toArray()
     _bool =
-      this.mousePos.x >= x0 &&
-      this.mousePos.x <= x1 &&
-      this.mousePos.y >= y0 &&
-      this.mousePos.y <= y1
+      isLeft([x, y], [x0, y0], [x1, y1]) > 0 &&
+      isLeft([x, y], [x1, y1], [x2, y2]) > 0 &&
+      isLeft([x, y], [x2, y2], [x3, y3]) > 0 &&
+      isLeft([x, y], [x3, y3], [x0, y0]) > 0
     if (_bool) {
       this.state = 'move'
       return 'move'

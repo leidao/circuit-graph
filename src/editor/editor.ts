@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-01 17:17:18
  * @LastEditors: ldx
- * @LastEditTime: 2024-01-05 18:06:57
+ * @LastEditTime: 2024-01-08 00:07:01
  */
 
 import _ from 'lodash'
@@ -89,29 +89,6 @@ export class Editor {
       this.scene.render()
     })
 
-    for (let i = 0; i < 1000; i++) {
-      const rect = new Shape({
-        points: [
-          [-50, -50],
-          [50, -50],
-          [50, 50],
-          [-50, 50]
-        ],
-        position: new Vector2(i * 20 * Math.random(), i * 20 * Math.random()),
-        style: {
-          fillStyle: 'red'
-          // strokeStyle: '#000000',
-          // lineWidth: 10,
-          // shadowColor: '#00ff00',
-          // shadowBlur: 100,
-          // shadowOffsetX: 14,
-          // shadowOffsetY: 18
-          // lineWidth: 20
-        }
-      })
-      this.baseLayer.add(rect)
-    }
-
     this.scene.render()
     // tool管理
     this.toolManager = new ToolManager(this)
@@ -124,28 +101,70 @@ export class Editor {
     this.activeKeyboard()
 
     setTimeout(() => {
-      for (let i = 0; i < 100; i++) {
-        const rect = new Shape({
-          points: [
-            [-50, -50],
-            [50, -50],
-            [50, 50],
-            [-50, 50]
-          ],
-          position: new Vector2(i * 20 * Math.random(), i * 20 * Math.random()),
-          style: {
-            fillStyle: 'red',
-            // strokeStyle: '#000000',
-            // lineWidth: 10,
-            shadowColor: '#00ff00',
-            shadowBlur: 100,
-            shadowOffsetX: 14,
-            shadowOffsetY: 18
-            // lineWidth: 20
-          }
-        })
-        this.baseLayer.add(rect)
-      }
+      // for (let i = 0; i < 2; i++) {
+      //   const rect = new Shape({
+      //     points: [
+      //       [-50, -50],
+      //       [50, -50],
+      //       [50, 50],
+      //       [-50, 50]
+      //     ],
+      //     // position: new Vector2(i * 20 * Math.random(), i * 20 * Math.random()),
+      //     style: {
+      //       fillStyle: 'red',
+      //       // strokeStyle: '#000000',
+      //       // lineWidth: 10,
+      //       shadowColor: '#00ff00',
+      //       shadowBlur: 100,
+      //       shadowOffsetX: 14,
+      //       shadowOffsetY: 18
+      //       // lineWidth: 20
+      //     }
+      //   })
+      //   this.baseLayer.add(rect)
+      // }
+      const rect1 = new Shape({
+        points: [
+          [-50, -50],
+          [50, -50],
+          [50, 50],
+          [-50, 50]
+        ],
+        position: new Vector2(100, 0),
+        style: {
+          fillStyle: 'red',
+          // strokeStyle: '#000000',
+          // lineWidth: 10,
+          shadowColor: '#00ff00',
+          shadowBlur: 100,
+          shadowOffsetX: 14,
+          shadowOffsetY: 18
+          // lineWidth: 20
+        }
+      })
+      rect1.scale.set(1.5, 1)
+      // rect1.rotate = 45 * (Math.PI / 180)
+      // this.baseLayer.add(rect1)
+      const rect2 = new Shape({
+        points: [
+          [-50, -50],
+          [50, -50],
+          [50, 50],
+          [-50, 50]
+        ],
+        position: new Vector2(100, 0),
+        style: {
+          fillStyle: 'blue',
+          // strokeStyle: '#000000',
+          // lineWidth: 10,
+          shadowColor: '#00ff00',
+          shadowBlur: 100,
+          shadowOffsetX: 14,
+          shadowOffsetY: 18
+          // lineWidth: 20
+        }
+      })
+      this.baseLayer.add(rect2)
       this.scene.render()
     }, 0)
   }
