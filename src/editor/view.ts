@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2024-08-20 14:50:58
  * @LastEditors: ldx
- * @LastEditTime: 2024-09-25 15:14:07
+ * @LastEditTime: 2024-09-25 15:16:51
  */
 
 import _ from 'lodash'
@@ -94,7 +94,7 @@ export class EditorView {
     //   name: '线段',
     // })
     // this.app.tree.add(line)
-    this.app.tree.set(data)
+    this.app.tree.set(data as any)
 
     this.app.tree.emit('update')
 
