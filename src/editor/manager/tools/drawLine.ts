@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2023-12-09 10:21:06
  * @LastEditors: ldx
- * @LastEditTime: 2024-09-25 14:54:31
+ * @LastEditTime: 2024-09-27 13:56:54
  */
 import { v4 } from 'uuid'
 import { EditorView } from '@/editor/view'
@@ -30,6 +30,7 @@ export default class ToolDrawLine extends ToolBase {
     this.line = new Line({
       editable: true,
       strokeWidth: 1,
+      // strokeWidthFixed:true,
       stroke: '#ff0000',
       name: '线段',
       id: v4()

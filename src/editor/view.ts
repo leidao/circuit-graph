@@ -3,7 +3,7 @@
  * @Author: ldx
  * @Date: 2024-08-20 14:50:58
  * @LastEditors: ldx
- * @LastEditTime: 2024-09-25 15:16:51
+ * @LastEditTime: 2024-09-27 14:00:12
  */
 
 import _ from 'lodash'
@@ -17,6 +17,7 @@ import Manager from './manager/index'
 import Ruler from './objects/ruler'
 import { loadSVG } from './utils'
 import data from './data.json'
+import Grid from './objects/grid'
 type Option = {
   container: HTMLDivElement
 }
@@ -27,6 +28,8 @@ export class EditorView {
   manager!: Manager
   /** 标尺 */
   ruler!: Ruler
+  /**  */
+  grid!: Grid
   constructor(option: Option) {
     if (!option.container) return
     // 场景相关
@@ -35,12 +38,15 @@ export class EditorView {
     this.app = new App({
       view: this.domElement,
       // 会自动创建 editor实例、tree层、sky层
+      ground: { type: 'draw' }, // 可选
+      zoom: { min: 0.2, max: 50 },
       editor: {
         /** 锁定元素的宽高比 */
         // lockRatio: true
       }
     })
     this.ruler = new Ruler(this.app)
+    this.grid = new Grid(this.app)
 
     // 管理器
     this.manager = new Manager(this)
@@ -141,7 +147,8 @@ export class EditorView {
         x: coord.x - width / 2,
         y: coord.y - height / 2,
         lockRatio: true,
-        zIndex:Infinity
+        zIndex:Infinity,
+        // hitFill: 'pixel'
       })
 
       const image = new Image({
@@ -152,6 +159,7 @@ export class EditorView {
         height: height,
         // editable: true,
         name: '图元_内容',
+        //  hitFill: 'pixel'
       })
 
       group.add(image)

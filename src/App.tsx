@@ -51,7 +51,7 @@ const Home = () => {
         </div>
         <div className="flex-1 relative box-border h-100%">
           <div
-            className="absolute left-0px box-border w-100% h-100% bg-#f4f4f4 border-solid border-t-0px border-b-0px border-#dadadc99"
+            className="absolute left-0px box-border w-100% h-100% bg-#fff border-solid border-t-0px border-b-0px border-#dadadc99"
             ref={container}
           >
           </div>
